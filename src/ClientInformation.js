@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import FormLayout from './FormLayout'; // Import the layout
 
 const ClientInformation = () => {
@@ -132,16 +132,18 @@ const ClientInformation = () => {
     proneToFainting: Yup.string().required('Please select if you are prone to fainting.'),
     medicalConditions: Yup.array().min(1, 'At least one medical condition must be selected.'),
     accutaneOrHRT: Yup.string()
-    .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
-    .required('Please select Yes or No for Accutane or HRT.'),
-  
-  takingAccutaneOrHRT: Yup.boolean()
-    .when('accutaneOrHRT', (accutaneOrHRT, schema) => {
-      // Check if accutaneOrHRT is 'yes'
-      return accutaneOrHRT === 'yes'
-        ? schema.oneOf([true], 'You must confirm that you will be taking Accutane or HRT.')
-        : schema.notRequired();
-    }),
+      .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
+      .required('Please select Yes or No for Accutane or HRT.'),
+
+    takingAccutaneOrHRT: Yup.boolean()
+      .when('accutaneOrHRT', (accutaneOrHRT, schema) => {
+        return accutaneOrHRT === 'yes'
+          ? schema.oneOf([true], 'You must confirm that you will be taking Accutane or HRT.')
+          : schema.notRequired();
+      }),
+    onAntibiotics: Yup.string().required('Please select if you are on antibiotics.'),
+    submergeAgreement: Yup.boolean().oneOf([true], 'You must confirm you will not submerge you piercing for 3 months after getting pierced.'),
+    termsAndConditions: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions.'),
 });
 
   
@@ -167,8 +169,11 @@ const ClientInformation = () => {
         fearMedical: '',
         proneToFainting: '',
         medicalConditions: [],
-        accutaneOrHRT: '', // Ensure this matches your form's field name
+        accutaneOrHRT: '', 
         takingAccutaneOrHRT: false,
+        onAntibiotics: '',
+        submergeAgreement: false,
+        termsAndConditions: false,
     }}
     validationSchema={validationSchema}
     onSubmit={(values) => {
@@ -201,7 +206,7 @@ const ClientInformation = () => {
                     name={name}
                     className="border border-gray-300 p-2 rounded w-3/4"
                   />
-                  <ErrorMessage name={name} component="div" className="text-red-500 mt-1" />
+                  <ErrorMessage name={name} component="div" className="text-red-500 mt-1 text-left w-3/4" />
                 </div>
               ))}
             </div>
@@ -298,7 +303,7 @@ const ClientInformation = () => {
                 I am of the age of consent as noted above or older or have parental consent for this service piercing
             </label>
             </div>
-            <ErrorMessage name="consent" component="div" className="text-red-500 mt-1 text-center" />
+            <ErrorMessage name="consent" component="div" className="text-red-600 ml-44 " />
 
 
             {/* Food Allergies Field */}
@@ -382,57 +387,120 @@ const ClientInformation = () => {
             <ErrorMessage name="medicalConditions" component="div" className="text-red-600" />
             </div>
             
-            <div className="flex flex-col items-left mt-6 ml-44">
-                        <label className="block mb-2">
-                            Have you in the past six months, or will you be in the following six months be taking Accutane or Hormone Replacement Therapy (HRT)?
-                        </label>
-                        <label className="flex items-center mb-2">
-                            <Field
-                                type="radio"
-                                name="accutaneOrHRT"
-                                value="yes"
-                                className="mr-2"
-                                onChange={() => {
-                                    setFieldValue('accutaneOrHRT', 'yes');
-                                    setTakingAccutaneOrHRT(true);
-                                }}
-                            />
-                            Yes
-                        </label>
-                        <label className="flex items-center mb-2">
-                            <Field
-                                type="radio"
-                                name="accutaneOrHRT"
-                                value="no"
-                                className="mr-2"
-                                onChange={() => {
-                                    setFieldValue('accutaneOrHRT', 'no');
-                                    setTakingAccutaneOrHRT(false);
-                                }}
-                            />
-                            No
-                        </label>
-                        {touched.accutaneOrHRT && errors.accutaneOrHRT ? (
-                        <div className="text-red-500">{errors.accutaneOrHRT}</div>
-                        ) : null}
-                    </div>
-                                
-                    {/* Conditional Checkbox for Accutane or HRT */}
-                    {takingAccutaneOrHRT && (
-                        <div className="flex items-left mt-4 ml-44">
-                            <label className="flex items-center mb-2">
-                                <Field
-                                    type="checkbox"
-                                    name="takingAccutaneOrHRT"
-                                    className="mr-2"
-                                />
-                                I confirm that I will be taking Accutane or HRT.
-                            </label>
+            {/* Accutane or HRT */}
+            <div className="flex flex-col items-left mt-6 ml-44 ">
+                <label className="block mb-2">
+                    Have you in the past six months, or will you be in the following six months be taking Accutane or Hormone Replacement Therapy (HRT)?
+                </label>
+                <label className="flex items-center mb-2">
+                    <Field
+                        type="radio"
+                        name="accutaneOrHRT"
+                        value="yes"
+                        className="mr-2"
+                        onChange={() => {
+                            setFieldValue('accutaneOrHRT', 'yes');
+                            setTakingAccutaneOrHRT(true);
+                        }}
+                    />
+                    Yes
+                </label>
+                <label className="flex items-center mb-2">
+                    <Field
+                        type="radio"
+                        name="accutaneOrHRT"
+                        value="no"
+                        className="mr-2"
+                        onChange={() => {
+                            setFieldValue('accutaneOrHRT', 'no');
+                            setTakingAccutaneOrHRT(false);
+                        }}
+                    />
+                    No
+                </label>
+                <ErrorMessage name="accutaneOrHRT" component="div" className="text-red-600" />
+            </div>
                             
-                        </div>
-                    )}
+            {/* Conditional Checkbox for Accutane or HRT */}
+            {takingAccutaneOrHRT && (
+                <div className="mt-4 ml-44">
+                <p className="text-blue-500 hover:underline mb-2">
+                    Please review our 
+                    <a href="https://www.lynnloheide.com/post/accutane-and-piercings" className="text-blue-500" target="_blank" rel="noopener noreferrer"> Accutane and HRT guidelines</a> 
+                        
+                </p>
+                </div>
+            )}
 
-            <div className="flex justify-between mt-6">
+            {takingAccutaneOrHRT && (
+                <div className="flex items-left ml-44">
+                    <label className="flex items-center mb-2">
+                        <Field
+                            type="checkbox"
+                            name="takingAccutaneOrHRT"
+                            className="mr-2"
+                        />
+                        I confirm that I will be taking Accutane or HRT.
+                    </label>
+                    <ErrorMessage name="takingAccutaneOrHRT" component="div" className="text-red-600" />
+                </div>
+            )}
+            
+
+            {/* On Antibiotics */}
+            <div className="flex flex-col items-left mt-6 ml-44 ">
+            <label className="block mb-2">Are you currenty on Antibiotics?</label>
+            <label className="flex items-center mb-2">
+                <Field type="radio" name="onAntibiotics" value="yes" className="mr-2" />
+                Yes
+            </label>
+            <label className="flex items-center mb-2">
+                <Field type="radio" name="onAntibiotics" value="no" className="mr-2" />
+                No
+            </label>
+            <ErrorMessage name="onAntibiotics" component="div" className="text-red-600" />
+            </div>
+
+            {/* Submerge Agreement */}
+            <div className="flex items-center mt-6 ml-44 ">
+            <Field type="checkbox" name="submergeAgreement" className="mr-2" />
+            <label htmlFor="consent" className="text-left">
+                I will not submerge my piercing in any water for 3 months after getting pierced.
+            </label>
+            </div>
+            <ErrorMessage name="submergeAgreement" component="div" className="text-red-600 ml-44" />
+
+           {/* Terms and Conditions Checkbox */}
+            <div className="flex flex-col items-center mt-6 ml-1.5">
+            <div className="flex items-center w-3/4">
+                <Field
+                type="checkbox"
+                name="termsAndConditions"
+                className="mr-2"
+                />
+                <label>
+                I accept the Terms and Conditions.
+                </label>
+            </div>
+            <ErrorMessage name="termsAndConditions" component="div" className="text-red-500 mt-1 text-left w-3/4" />
+            </div>
+
+            {/* Terms and Conditions Text Field */}
+            <div className="flex flex-col items-center mt-6 ml-1.5">
+            <label className="block mb-2 text-left w-3/4">Terms and Conditions:</label>
+            <Field
+                as="textarea"
+                name="termsAndConditionsText"
+                className="border border-gray-300 p-2 rounded w-3/4"
+                rows="5" // Adjust the number of rows for desired height
+                readOnly // Optional: set to true if you want the user to only view it
+            >
+                This is to certify that I, the above signed and undersigned, do give my permission to be pierced at INK FX TATTOO AND PIERCING LTD. I have answered all the above questions truthfully. I am fully aware of and take full responsibility for the healing and daily aftercare procedures. As well as the fact that there is a chance of an adverse reaction or infection even when all appropriate sanitary and professional measures were taken by the above-named business, and they shall not be liable for such an event.
+            </Field>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="flex justify-between mt-6 ">
               <button
                 type="button"
                 className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
