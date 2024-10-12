@@ -9,42 +9,55 @@ const ServiceSelection = () => {
   const location = useLocation();
   const selectedPiercer = location.state?.piercer || 'Other';
 
-  const piercings = [
-    // List of allowed piercings...
-    'Conch Piercing', 'Helix Piercing', 'Hidden Helix Piercing', // Jennica's allowed piercings
-    'Angel Fangs Piercing', 'Bridge Piercing', 'Cheek or Dahlia Piercing', 'Christina Piercing',
-    'Daith Piercing', 'Dermal Piercing', 'Eyebrow Piercing', 'Fangs Piercing',
-    'Flat/Scapha Piercing', 'Forward Helix Piercing', 'Industrial Piercing', 'Jestrum (Vertical Philtrum) Piercing',
-    'Labia Piercing', 'Labret Piercing', 'Lobe Piercing (Single)', 'Lobe Piercing (Pair)', 
-    'Lobe Piercing Ages 5-12 (Single)', 'Lobe Piercing Ages 5-12 (Pair)', 'Mantis (Forward Facing Nostrils) Piercing',
-    'Monroe or Madonna Piercing', 'Navel Piercing', 'Nipple Piercing (Single)', 'Nipple Piercing (Pair)', 
-    'Nostril Piercing', 'Orbital Piercing', 'Philtrum/Medusa Piercing', 'Rook Piercing', 'Septum Piercing', 
-    'Snake Bites Piercing', 'Tongue Piercing', 'Tongue Web Piercing', 'Tragus Piercing', 'VCH Piercing', 
-    'Vertical Labret Piercing'
-  ];
+  const piercings = {
+    'Ear - Lobe': [
+      'Lobe Piercing (Single)', 'Lobe Piercing (Pair)', 
+      'Lobe Piercing Ages 5-12 (Single)', 'Lobe Piercing Ages 5-12 (Pair)'
+    ],
+    'Ear - Cartilage': [
+      'Helix Piercing', 'Hidden Helix Piercing', 'Forward Helix Piercing', 
+      'Flat Piercing', 'Conch Piercing', 'Tragus Piercing', 'Rook Piercing',
+      'Daith Piercing', 'Orbital Piercing', 'Industrial Piercing'  
+    ],
+    'Face': [
+      'Nostril Piercing', 'Septum Piercing', 'Mantis (Forward Facing Nostrils) Piercing', 
+      'Eyebrow Piercing', 'Bridge Piercing'
+    ],
+    'Oral': [
+      'Labret Piercing', 'Vertical Labret Piercing', 'Philtrum/Medusa Piercing', 'Vertical Philtrum (Jestrum) Piercing',
+      'Madonna Piercing', 'Monroe Piercing', 'Cheek Piercing', 'Dahlia Piercing', 'Snake Bites Piercing', 'Angel Bites Piercing',
+      'Inverted Fangs Piercing',  'Tongue Piercing', 'Tongue Web Piercing',
+    ],
+    
+    'Body': [
+        'Navel Piercing','Nipple Piercing (Single)', 'Nipple Piercing (Pair)', 'Dermal Piercing', 
+      ],
+    
+    'Below the Belt': [
+        'VCH Piercing', 'Christina Piercing', 'Labia Piercing',   
+    ]
+  };
 
   const jewelryChanges = [
-    // List of jewelry changes...
-    'Jewelry Change (One Change)', 'Jewelry Change (Two Changes)', 'Jewelry Change (Three Changes)',
-    'Jewelry Change (Four Changes)', 'Jewelry Change (Five Changes)', 'Jewelry Change (Six Changes)',
+    'Jewelry Change (One Change)', 'Jewelry Change (Two Changes)', 
+    'Jewelry Change (Three Changes)', 'Jewelry Change (Four Changes)', 
+    'Jewelry Change (Five Changes)', 'Jewelry Change (Six Changes)', 
     'Jewelry Change (Seven Changes)', 'Jewelry Change (Eight Changes)'
   ];
 
   let jewelryDownsizes = [
-    // List of jewelry downsizing...
-    'Jewelry Downsize (One)', 'Jewelry Downsize (Two)', 'Jewelry Downsize (Three)',
-    'Jewelry Downsize (Four)', 'Jewelry Downsize (Five)', 'Jewelry Downsize (Six)',
-    'Jewelry Downsize (Seven)', 'Jewelry Downsize (Eight)', 'Jewelry Removal (Dermal)', 
-    'Jewelry Removal (General)', 'General Checkup', 'Cheek/Dahlia Consultation'
+    'Jewelry Downsize (One)', 'Jewelry Downsize (Two)', 
+    'Jewelry Downsize (Three)', 'Jewelry Downsize (Four)', 
+    'Jewelry Downsize (Five)', 'Jewelry Downsize (Six)', 
+    'Jewelry Downsize (Seven)', 'Jewelry Downsize (Eight)', 
+    'Jewelry Removal (Dermal)', 'Jewelry Removal (General)', 
+    'General Checkup', 'Cheek/Dahlia Consultation'
   ];
 
   if (selectedPiercer === 'Jennica') {
-    jewelryDownsizes = jewelryDownsizes.filter(service => !['Jewelry Removal (Dermal)', 'Cheek/Dahlia Consultation'].includes(service));
+    jewelryDownsizes = jewelryDownsizes.filter(service => 
+      !['Jewelry Removal (Dermal)', 'Cheek/Dahlia Consultation'].includes(service));
   }
-
-  const filteredPiercings = selectedPiercer === 'Jennica'
-    ? piercings.filter(piercing => ['Conch Piercing', 'Helix Piercing', 'Hidden Helix Piercing'].includes(piercing))
-    : piercings;
 
   const validationSchema = Yup.object({
     services: Yup.array()
@@ -54,7 +67,6 @@ const ServiceSelection = () => {
 
   const validateForm = (values) => {
     const errors = {};
-    
     const nonPiercingSelected = values.services.some(service =>
       jewelryChanges.includes(service) || jewelryDownsizes.includes(service)
     );
@@ -68,73 +80,118 @@ const ServiceSelection = () => {
 
   return (
     <Formik
-      initialValues={{ services: [], selectedPiercing: '' }}
-      validationSchema={validationSchema}
-      validate={validateForm}
-      onSubmit={(values) => {
-        console.log('Form values:', values); // Check if this gets logged
-        navigate('/client-info'); // Navigate to client info
-      }}
-    >
-      {({ errors, touched, values }) => (
-        <FormLayout>
-            <Form>
+  initialValues={{ services: [], selectedPiercing: '' }}
+  validationSchema={validationSchema}
+  validate={validateForm}
+  onSubmit={(values) => {
+    console.log('Form values:', values);
+    navigate('/client-info');
+  }}
+>
+  {({ errors, touched, values }) => {
+    const isMaxServicesSelected = values.services.length >= 3;
+
+    return (
+      <FormLayout>
+        <Form>
           <h2 className="text-3xl font-bold mb-6 text-center">Select Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Piercings Section */}
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+            
+            {/* First Column: Ear - Lobe, Ear - Cartilage, Face */}
+            <div className="col-span-1 px-2">
               <h3 className="text-xl font-semibold mb-4">Piercings</h3>
-              <div className="space-y-2">
-                {filteredPiercings.map((service, index) => (
-                  <label key={index} className="flex items-center">
-                    <Field 
-                      type="checkbox" 
-                      name="services" 
-                      value={service} 
-                      className="mr-2" 
-                      disabled={values.services.length >= 3 && !values.services.includes(service)}
-                    />
-                    {service}
-                  </label>
+              <div className="space-y-6">
+                {Object.entries(piercings).slice(0, 3).map(([category, services]) => (
+                  <div key={category}>
+                    <h4 className="text-lg font-semibold mb-2">{category}</h4>
+                    <div className="space-y-2">
+                      {services.map((service, index) => (
+                        <label key={index} className="flex items-center">
+                          <Field
+                            type="checkbox"
+                            name="services"
+                            value={service}
+                            className="mr-2"
+                            disabled={
+                              (isMaxServicesSelected && !values.services.includes(service)) ||
+                              (selectedPiercer === 'Jennica' &&
+                                !['Conch Piercing', 'Helix Piercing', 'Hidden Helix Piercing'].includes(service))
+                            }
+                          />
+                          {service}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Jewelry Changes Section */}
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Jewelry Changes</h3>
-              <div className="space-y-2">
-                {jewelryChanges.map((service, index) => (
-                  <label key={index} className="flex items-center">
-                    <Field 
-                      type="checkbox" 
-                      name="services" 
-                      value={service} 
-                      className="mr-2" 
-                      disabled={values.services.length >= 3 && !values.services.includes(service)}
-                    />
-                    {service}
-                  </label>
+            {/* Second Column: Oral, Body, Below the Belt */}
+            <div className="col-span-1 px-2">
+              <h3 className="text-xl font-semibold mb-4"></h3>
+              <div className="space-y-6">
+                {Object.entries(piercings).slice(3).map(([category, services]) => (
+                  <div key={category}>
+                    <h4 className="text-lg font-semibold mb-2">{category}</h4>
+                    <div className="space-y-2">
+                      {services.map((service, index) => (
+                        <label key={index} className="flex items-center">
+                          <Field
+                            type="checkbox"
+                            name="services"
+                            value={service}
+                            className="mr-2"
+                            disabled={
+                              (isMaxServicesSelected && !values.services.includes(service)) ||
+                              (selectedPiercer === 'Jennica' &&
+                                !['Conch Piercing', 'Helix Piercing', 'Hidden Helix Piercing'].includes(service))
+                            }
+                          />
+                          {service}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Jewelry Downsizing Section */}
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Jewelry Downsizing</h3>
-              <div className="space-y-2">
-                {jewelryDownsizes.map((service, index) => (
-                  <label key={index} className="flex items-center">
-                    <Field 
-                      type="checkbox" 
-                      name="services" 
-                      value={service} 
-                      className="mr-2" 
-                      disabled={values.services.length >= 3 && !values.services.includes(service)}
-                    />
-                    {service}
-                  </label>
-                ))}
+            {/* Third Column: Jewelry Changes and Downsizes */}
+            <div className="col-span-1 px-2">
+              <h3 className="text-xl font-semibold mb-4">Jewelry Changes & Downsizes</h3>
+              <div className="space-y-6">
+                <h4 className="text-lg font-semibold mb-2">Jewelry Changes</h4>
+                <div className="space-y-2">
+                  {jewelryChanges.map((service, index) => (
+                    <label key={index} className="flex items-center">
+                      <Field
+                        type="checkbox"
+                        name="services"
+                        value={service}
+                        className="mr-2"
+                        disabled={isMaxServicesSelected && !values.services.includes(service)}
+                      />
+                      {service}
+                    </label>
+                  ))}
+                </div>
+
+                <h4 className="text-lg font-semibold mb-2">Jewelry Downsizing</h4>
+                <div className="space-y-2">
+                  {jewelryDownsizes.map((service, index) => (
+                    <label key={index} className="flex items-center">
+                      <Field
+                        type="checkbox"
+                        name="services"
+                        value={service}
+                        className="mr-2"
+                        disabled={isMaxServicesSelected && !values.services.includes(service)}
+                      />
+                      {service}
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -142,11 +199,13 @@ const ServiceSelection = () => {
           {/* Show text box if non-piercing service is selected */}
           {values.services.some(service => jewelryChanges.includes(service) || jewelryDownsizes.includes(service)) && (
             <div className="mt-4">
-              <label className="block text-lg font-medium">Specify which piercing is getting changed, downsized, removed, etc.</label>
-              <Field 
-                type="text" 
-                name="selectedPiercing" 
-                placeholder="Specify each piercing" 
+              <label className="block text-lg font-medium">
+                Specify which piercing is getting changed, downsized, removed, etc.
+              </label>
+              <Field
+                type="text"
+                name="selectedPiercing"
+                placeholder="Specify each piercing"
                 className="mt-2 p-2 border border-gray-300 rounded w-full"
               />
               <ErrorMessage name="selectedPiercing" component="div" className="text-red-500 mt-2" />
@@ -162,7 +221,7 @@ const ServiceSelection = () => {
             <button
               type="button"
               className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-              onClick={() => navigate('/')} // Adjust the previous button if necessary
+              onClick={() => navigate('/')}
             >
               Previous
             </button>
@@ -170,10 +229,11 @@ const ServiceSelection = () => {
               Next
             </button>
           </div>
-          </Form>
-        </FormLayout>
-      )}
-    </Formik>
+        </Form>
+      </FormLayout>
+    );
+  }}
+</Formik>
   );
 };
 

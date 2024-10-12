@@ -3,9 +3,17 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate} from 'react-router-dom';
 import FormLayout from './FormLayout'; // Import the layout
+import SignatureField from './SignatureField'; // Import your signature field
 
 const ClientInformation = () => {
   const navigate = useNavigate();
+
+  
+    const [signature, setSignature] = useState('');
+
+    const handleSignatureChange = (data) => {
+        setSignature(data); // Update the signature state
+    };
 
   // States for the first photo capture
   const [imagePreview1, setImagePreview1] = useState(null);
@@ -178,7 +186,7 @@ const ClientInformation = () => {
     validationSchema={validationSchema}
     onSubmit={(values) => {
         console.log("Submitting values: ", values);
-        navigate('/confirmation');
+        navigate('/confirmation', { state: { formData: values } });  // Navigate to confirmation page
     }}
     >
       {({ errors, touched, setFieldValue }) => (
@@ -470,7 +478,29 @@ const ClientInformation = () => {
             </div>
             <ErrorMessage name="submergeAgreement" component="div" className="text-red-600 ml-44" />
 
-           {/* Terms and Conditions Checkbox */}
+           
+
+            {/* Terms and Conditions Text Field */}
+            <div className="flex flex-col items-center mt-6 ml-1.5">
+            <label className="block mb-2 text-left w-3/4">Terms and Conditions:</label>
+                <Field
+                    as="textarea"
+                    name="termsAndConditionsText"
+                    className="border border-gray-300 p-2 rounded w-3/4"
+                    rows="5" // Adjust the number of rows for desired height
+                    readOnly
+                    defaultValue={`
+                    This is to certify that I, the above signed and undersigned, do give my permission 
+                    to be pierced at INK FX TATTOO AND PIERCING LTD. I have answered all the above questions 
+                    truthfully. I am fully aware of and take full responsibility for the healing and daily aftercare 
+                    procedures. As well as the fact that there is a chance of an adverse reaction or infection even 
+                    when all appropriate sanitary and professional measures were taken by the above-named business, 
+                    and they shall not be liable for such an event.
+                    `}
+                />
+            </div>
+
+            {/* Terms and Conditions Checkbox */}
             <div className="flex flex-col items-center mt-6 ml-1.5">
             <div className="flex items-center w-3/4">
                 <Field
@@ -485,20 +515,11 @@ const ClientInformation = () => {
             <ErrorMessage name="termsAndConditions" component="div" className="text-red-500 mt-1 text-left w-3/4" />
             </div>
 
-            {/* Terms and Conditions Text Field */}
-            <div className="flex flex-col items-center mt-6 ml-1.5">
-            <label className="block mb-2 text-left w-3/4">Terms and Conditions:</label>
-            <Field
-                as="textarea"
-                name="termsAndConditionsText"
-                className="border border-gray-300 p-2 rounded w-3/4"
-                rows="5" // Adjust the number of rows for desired height
-                readOnly // Optional: set to true if you want the user to only view it
-            >
-                This is to certify that I, the above signed and undersigned, do give my permission to be pierced at INK FX TATTOO AND PIERCING LTD. I have answered all the above questions truthfully. I am fully aware of and take full responsibility for the healing and daily aftercare procedures. As well as the fact that there is a chance of an adverse reaction or infection even when all appropriate sanitary and professional measures were taken by the above-named business, and they shall not be liable for such an event.
-            </Field>
+            {/* Signature Field */}
+            <div>
+                <SignatureField onChange={handleSignatureChange} />
             </div>
-            
+
             {/* Submit Button */}
             <div className="flex justify-between mt-6 ">
               <button

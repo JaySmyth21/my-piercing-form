@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ServiceSelection from './ServiceSelection';
 import ClientInformation from './ClientInformation';
 import SelectPiercer from './SelectPiercer';
+import ConfirmationPage from './ConfirmationPage';
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
       <Route path="/select-piercer" element={<SelectPiercer />} />
       <Route path="/service-selection" element={<ServiceSelection />} />
       <Route path="/client-info" element={<ClientInformation />} />
-      {/* Add other routes as necessary */}
+      <Route path="/confirmation" element={<ConfirmationPage />} />
+      
     </Routes>
   );
 }
