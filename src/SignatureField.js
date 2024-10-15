@@ -1,6 +1,6 @@
-// SignatureField.js
 import React, { useRef, useEffect, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import { ErrorMessage } from 'formik';
 
 const SignatureField = ({ onChange }) => {
     const signatureRef = useRef({});
@@ -20,10 +20,14 @@ const SignatureField = ({ onChange }) => {
     // Update canvas size based on the window size
     useEffect(() => {
         const updateCanvasSize = () => {
-            const parentWidth = document.querySelector('.signature-container').clientWidth; // Get the container width
-            const newWidth = Math.min(parentWidth, 600); // Max width set to 600
-            const newHeight = (newWidth * 200) / 400; // Maintain aspect ratio
-            setCanvasSize({ width: newWidth, height: newHeight });
+            const parent = document.querySelector('.signature-container'); // Get the parent container
+            if (parent) {
+                const parentWidth = parent.clientWidth; // Get the container width
+                const aspectRatio = 2; // Width to height ratio (e.g., 2:1)
+                const newWidth = parentWidth; // Use full width of the container
+                const newHeight = newWidth / aspectRatio; // Calculate height based on aspect ratio
+                setCanvasSize({ width: newWidth, height: newHeight });
+            }
         };
 
         window.addEventListener('resize', updateCanvasSize);
@@ -35,21 +39,22 @@ const SignatureField = ({ onChange }) => {
     }, []);
 
     return (
-        <div className="flex flex-col items-center mt-10 w-3/4 mx-auto">
-            <label className="block mb-2 text-left">Client Signature:</label>
-            <div className="signature-container w-full max-w-[600px]"> {/* Set max width */}
+        <div className="flex flex-col items-center mt-10 w-full">
+            <label className="block mb-2 text-left w-full sm:w-3/4">Client Signature:</label>
+            <div className="signature-container w-full sm:w-3/4"> {/* Full width container */}
                 <SignatureCanvas
                     ref={signatureRef}
-                    penColor='black'
+                    penColor="black"
                     canvasProps={{
-                        width: canvasSize.width,  // Set dynamic width
-                        height: canvasSize.height, // Set dynamic height
-                        className: 'border border-gray-300 rounded w-full'
+                        width: canvasSize.width,
+                        height: canvasSize.height,
+                        className: 'border border-gray-300 p-2 rounded w-full'
                     }}
-                    onEnd={handleEnd} // Automatically save on drawing end
+                    onEnd={handleEnd}
                 />
             </div>
-            <div className="signature-controls mt-2">
+            <ErrorMessage name="signature" component="div" className="text-red-500 mt-2" />
+            <div className="signature-controls mt-2 w-full sm:w-3/4 flex justify-end">
                 <button
                     type="button"
                     onClick={clearSignature}
