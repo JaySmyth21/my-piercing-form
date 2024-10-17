@@ -532,7 +532,7 @@ const ClientInformation = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Please review our Accutane and HRT guidelines
+                 Risks that come along with being pierced on HRT or Accutane.
                 </a>.
               </p>
             </div>
@@ -546,7 +546,7 @@ const ClientInformation = () => {
                   name="takingAccutaneOrHRT"
                   className="mr-2"
                 />
-                I confirm that I will be taking Accutane or HRT. <span className="text-red-600 ml-1">*</span>
+                I understand the risks that come along with being pierced on either Accutane or HRT. <span className="text-red-600 ml-1">*</span>
               </label>
               <ErrorMessage name="takingAccutaneOrHRT" component="div" className="text-red-600" />
             </div>

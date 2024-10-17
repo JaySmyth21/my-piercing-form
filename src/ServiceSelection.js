@@ -74,7 +74,7 @@ const ServiceSelection = () => {
   const validateForm = (values) => {
     const errors = {};
     const nonPiercingSelected = values.services.some(service =>
-      jewelryChanges.includes(service) || jewelryDownsizes.includes(service) || other.includes(service)
+      jewelryChanges.includes(service) || jewelryDownsizes.includes(service) || specificOther.includes(service)
     );
 
     if (nonPiercingSelected && !values.selectedPiercing) {
