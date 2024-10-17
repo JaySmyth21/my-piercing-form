@@ -86,14 +86,15 @@ const ServiceSelection = () => {
 
   return (
     <Formik
-  initialValues={{ services: [], selectedPiercing: '' }}
-  validationSchema={validationSchema}
-  validate={validateForm}
-  onSubmit={(values) => {
-    console.log('Form values:', values);
-    navigate('/client-info');
-  }}
->
+    initialValues={{ services: [], selectedPiercing: '' }}
+    validationSchema={validationSchema}
+    validate={validateForm}
+    onSubmit={(values) => {
+      // Pass the selected services to ClientInformation
+      navigate('/client-info', { state: { selectedServices: values.services } });
+    }}
+  >
+  
   {({ errors, touched, values }) => {
     const isMaxServicesSelected = values.services.length >= 3;
 

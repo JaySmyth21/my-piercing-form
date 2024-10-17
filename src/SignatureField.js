@@ -40,7 +40,7 @@ const SignatureField = ({ onChange }) => {
 
     return (
         <div className="flex flex-col items-center mt-10 w-full">
-            <label className="block mb-2 text-left w-full sm:w-3/4">Client Signature:</label>
+            <label className="block mb-2 text-left w-full sm:w-3/4">Client Signature: <span className="text-red-600 ml-1">*</span></label>
             <div className="signature-container w-full sm:w-3/4"> {/* Full width container */}
                 <SignatureCanvas
                     ref={signatureRef}
@@ -54,7 +54,7 @@ const SignatureField = ({ onChange }) => {
                 />
             </div>
             <ErrorMessage name="signature" component="div" className="text-red-500 mt-2" />
-            <div className="signature-controls mt-2 w-full sm:w-3/4 flex justify-end">
+            <div className="signature-controls mt-2 w-full sm:w-3/4 flex justify-center">
                 <button
                     type="button"
                     onClick={clearSignature}

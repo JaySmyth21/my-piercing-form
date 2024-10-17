@@ -1,17 +1,42 @@
 import React, { useState, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import FormLayout from './FormLayout'; // Import the layout
 import SignatureField from './SignatureField'; // Import your signature field
 
 const ClientInformation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const formRef = useRef();
 
-  
+  const selectedServices = location.state?.selectedServices || [];
 
+  const jewelryChanges = [
+    'Jewelry Change (One Change)', 'Jewelry Change (Two Changes)', 
+    'Jewelry Change (Three Changes)', 'Jewelry Change (Four Changes)', 
+    'Jewelry Change (Five Changes)', 'Jewelry Change (Six Changes)', 
+    'Jewelry Change (Seven Changes)', 'Jewelry Change (Eight Changes)'
+  ];
 
-    
+  const jewelryDownsizes = [
+    'Jewelry Downsize (One)', 'Jewelry Downsize (Two)', 
+    'Jewelry Downsize (Three)', 'Jewelry Downsize (Four)', 
+    'Jewelry Downsize (Five)', 'Jewelry Downsize (Six)', 
+    'Jewelry Downsize (Seven)', 'Jewelry Downsize (Eight)',
+  ];
+
+  const other = [
+    'Embeded Jewelry', 'Jewelry Removal (General)', 
+    'Jewelry Removal (Dermal)', 'General Checkup', 'Cheek/Dahlia Consultation'
+  ];
+
+  // Check if any selected service is from Jewelry Change, Downsize, or Other
+  const shouldHideFields = selectedServices.some(service =>
+    jewelryChanges.includes(service) ||
+    jewelryDownsizes.includes(service) ||
+    other.includes(service)
+  );
 
   // States for the first photo capture
   const [imagePreview1, setImagePreview1] = useState(null);
@@ -150,10 +175,10 @@ const ClientInformation = () => {
     onAntibiotics: Yup.string().required('Please select if you are on antibiotics.'),
     submergeAgreement: Yup.boolean().oneOf([true], 'You must confirm you will not submerge you piercing for 3 months after getting pierced.'),
     termsAndConditions: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions.'),
-    signature: Yup.string().required('Signature is required'), // Add this line
+    signature: Yup.string().required('Signature is required')
 });
 
-  
+
 
   return (
         <Formik
@@ -184,170 +209,173 @@ const ClientInformation = () => {
         signature: '',
     }}
     
+    
     validationSchema={validationSchema}
     
     onSubmit={(values) => {
-        console.log("Submitting values: ", values);
+        console.log('Form submitted:', values);
         navigate('/confirmation', { state: { formData: values } });  // Navigate to confirmation page
+
     }}
     >
         
-      {({ errors, touched, setFieldValue }) => (
-        
+        {({ validateForm, errors, setFieldValue, submitForm, touched, setTouched }) => (
         <FormLayout>
-        <Form>
-            
-          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Client Information</h2>
-      
-          {/* Input Fields */}
-          <div className="flex flex-col space-y-4">
+          <Form ref={formRef}>
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Client Information</h2>
+
+            {/* Input Fields */}
+            <div className="flex flex-col space-y-4">
             {[
-              { name: 'preferredName', label: 'Preferred Name or First Name' },
-              { name: 'lastName', label: 'Last Name' },
-              { name: 'pronunciation', label: 'Pronunciation' },
-              { name: 'pronouns', label: 'Pronouns' },
-              { name: 'phoneNumber', label: 'Phone Number' },
-              { name: 'email', label: 'Email' },
-              { name: 'address', label: 'Address' },
-              { name: 'city', label: 'City' },
-              { name: 'postalCode', label: 'Postal Code' },
-              { name: 'age', label: 'Age' },
-              { name: 'occupation', label: 'Occupation/Sport' },
-            ].map(({ name, label }) => (
-              <div key={name} className="flex flex-col items-center">
-                <label className="block mb-2 text-left w-full sm:w-3/4">{label}</label>
+                { name: 'preferredName', label: 'Preferred Name or First Name', required: true },
+                { name: 'lastName', label: 'Last Name', required: true },
+                { name: 'pronunciation', label: 'Pronunciation', required: false },
+                { name: 'pronouns', label: 'Pronouns', required: false },
+                { name: 'phoneNumber', label: 'Phone Number', required: true },
+                { name: 'email', label: 'Email', required: true },
+                { name: 'address', label: 'Address', required: true },
+                { name: 'city', label: 'City', required: true },
+                { name: 'postalCode', label: 'Postal Code', required: true },
+                { name: 'age', label: 'Age', required: true },
+                { name: 'occupation', label: 'Occupation/Sport', required: false },
+                ].map(({ name, label, required }) => (
+                <div key={name} className="flex flex-col items-center">
+                <label className="block mb-2 text-left w-full sm:w-3/4">
+                    {label}
+                    {required && <span className="text-red-600 ml-1">*</span>}
+                </label>
                 <Field
-                  type={name === 'age' ? 'number' : 'text'}
-                  name={name}
-                  className="border border-gray-300 p-2 rounded w-full sm:w-3/4"
+                    type={name === 'age' ? 'number' : 'text'}
+                    name={name}
+                    className="border border-gray-300 p-2 rounded w-full sm:w-3/4"
                 />
                 <ErrorMessage name={name} component="div" className="text-red-500 mt-1 text-left w-full sm:w-3/4" />
-              </div>
+                </div>
             ))}
-          </div>
-      
-          {/* Camera Sections */}
-<div className="flex flex-col items-center mt-4">
-  <label className="block mb-2 text-left w-full sm:w-3/4">Take a Picture (Field 1)</label>
-
-  {/* Video for Camera */}
-  <video
-    ref={videoRef1}
-    autoPlay
-    className="border rounded w-full sm:w-3/4"
-    style={{ display: imagePreview1 ? 'none' : 'block' }}
-  />
-
-  {/* Image Preview for Captured Photo */}
-  {imagePreview1 && (
-    <img
-      src={imagePreview1}
-      alt="Captured Photo 1"
-      className="border rounded w-full sm:w-3/4"
-    />
-  )}
-
-  {/* Buttons for Camera */}
-  {!cameraOpened1 && !photoCaptured1 && (
-    <button
-      type="button"
-      onClick={getVideo1}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Open Camera
-    </button>
-  )}
-
-  {cameraOpened1 && !photoCaptured1 && (
-    <button
-      type="button"
-      onClick={() => takePicture1(setFieldValue)}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Capture Photo
-    </button>
-  )}
-
-  {photoCaptured1 && (
-    <button
-      type="button"
-      onClick={() => retakePicture1(setFieldValue)}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Retake Photo
-    </button>
-  )}
-
-  <canvas ref={canvasRef1} style={{ display: 'none' }} />
-  <ErrorMessage name="photo1" component="div" className="text-red-500 mt-1" />
-</div>
-
-{/* Repeat for Second Camera */}
-<div className="flex flex-col items-center mt-4">
-  <label className="block mb-2 text-left w-full sm:w-3/4">Take a Picture (Field 2)</label>
-
-  {/* Video for Camera */}
-  <video
-    ref={videoRef2}
-    autoPlay
-    className="border rounded w-full sm:w-3/4"
-    style={{ display: imagePreview2 ? 'none' : 'block' }}
-  />
-
-  {/* Image Preview for Captured Photo */}
-  {imagePreview2 && (
-    <img
-      src={imagePreview2}
-      alt="Captured Photo 2"
-      className="border rounded w-full sm:w-3/4"
-    />
-  )}
-
-  {/* Buttons for Camera */}
-  {!cameraOpened2 && !photoCaptured2 && (
-    <button
-      type="button"
-      onClick={getVideo2}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Open Camera
-    </button>
-  )}
-
-  {cameraOpened2 && !photoCaptured2 && (
-    <button
-      type="button"
-      onClick={() => takePicture2(setFieldValue)}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Capture Photo
-    </button>
-  )}
-
-  {photoCaptured2 && (
-    <button
-      type="button"
-      onClick={() => retakePicture2(setFieldValue)}
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
-    >
-      Retake Photo
-    </button>
-  )}
-
-  <canvas ref={canvasRef2} style={{ display: 'none' }} />
-</div>
-
-      
-          {/* Age of Consent Checkbox */}
-        <div className="flex flex-col items-center mt-10">
-            <div className="flex items-center w-full sm:w-3/4">
-                <Field type="checkbox" name="consent" className="mr-2" />
-                <label htmlFor="consent" className="text-left text-sm sm:text-base">
-                    I am of the age of consent or have parental consent for this service piercing
-                </label>
             </div>
-            <ErrorMessage name="consent" component="div" className="text-red-600 w-full sm:w-3/4 mt-2" />
-        </div>
+
+      
+            {/* Camera Sections */}
+            <div className="flex flex-col items-center mt-10">
+            <label className="block mb-2 text-left w-full sm:w-3/4">Government Issued ID<span className="text-red-600 ml-1">*</span></label> 
+
+            {/* Video for Camera */}
+            <video
+                ref={videoRef1}
+                autoPlay
+                className="border rounded w-full sm:w-3/4"
+                style={{ display: imagePreview1 ? 'none' : 'block' }}
+            />
+
+            {/* Image Preview for Captured Photo */}
+            {imagePreview1 && (
+                <img
+                src={imagePreview1}
+                alt="Captured Photo 1"
+                className="border rounded w-full sm:w-3/4"
+                />
+            )}
+
+            {/* Buttons for Camera */}
+            {!cameraOpened1 && !photoCaptured1 && (
+                <button
+                type="button"
+                onClick={getVideo1}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Open Camera
+                </button>
+            )}
+
+            {cameraOpened1 && !photoCaptured1 && (
+                <button
+                type="button"
+                onClick={() => takePicture1(setFieldValue)}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Capture Photo
+                </button>
+            )}
+
+            {photoCaptured1 && (
+                <button
+                type="button"
+                onClick={() => retakePicture1(setFieldValue)}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Retake Photo
+                </button>
+            )}
+
+            <canvas ref={canvasRef1} style={{ display: 'none' }} />
+            <ErrorMessage name="photo1" component="div" className="text-red-500 mt-1" />
+            </div>
+
+            {/* Repeat for Second Camera */}
+            <div className="flex flex-col items-center mt-10">
+            <label className="block mb-2 text-left w-full sm:w-3/4">Government Issued ID Parent/Legal Guardian <b>(Required if under 16)</b></label>
+
+            {/* Video for Camera */}
+            <video
+                ref={videoRef2}
+                autoPlay
+                className="border rounded w-full sm:w-3/4"
+                style={{ display: imagePreview2 ? 'none' : 'block' }}
+            />
+
+            {/* Image Preview for Captured Photo */}
+            {imagePreview2 && (
+                <img
+                src={imagePreview2}
+                alt="Captured Photo 2"
+                className="border rounded w-full sm:w-3/4"
+                />
+            )}
+
+            {/* Buttons for Camera */}
+            {!cameraOpened2 && !photoCaptured2 && (
+                <button
+                type="button"
+                onClick={getVideo2}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Open Camera
+                </button>
+            )}
+
+            {cameraOpened2 && !photoCaptured2 && (
+                <button
+                type="button"
+                onClick={() => takePicture2(setFieldValue)}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Capture Photo
+                </button>
+            )}
+
+            {photoCaptured2 && (
+                <button
+                type="button"
+                onClick={() => retakePicture2(setFieldValue)}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2"
+                >
+                Retake Photo
+                </button>
+            )}
+            <canvas ref={canvasRef2} style={{ display: 'none' }} />
+            </div>
+
+            
+            {/* Age of Consent Checkbox */}
+            <div className="flex flex-col items-center mt-10">
+                <div className="flex items-center w-full sm:w-3/4">
+                    <Field type="checkbox" name="consent" className="mr-2" />
+                    <label htmlFor="consent" className="text-left text-sm sm:text-base">
+                        I am of the age of consent or have parental consent for this service piercing <span className="text-red-600 ml-1">*</span>
+                    </label>
+                </div>
+                <ErrorMessage name="consent" component="div" className="text-red-600 w-full sm:w-3/4 mt-2" />
+            </div>
 
 
 
@@ -365,7 +393,7 @@ const ClientInformation = () => {
 
             {/* Reacted negatively to metal jewelry */}
             <div className="flex flex-col items-center mt-10">
-                <label className="block mb-2 text-left w-full sm:w-3/4"> Have you ever reacted negatively to metal jewelry? </label>
+                <label className="block mb-2 text-left w-full sm:w-3/4"> Have you ever reacted negatively to metal jewelry? <span className="text-red-600 ml-1">*</span> </label> 
                 <div className="w-full sm:w-3/4">
                     <label className="flex items-center mb-2">
                     <Field type="radio" name="negativeMetal" value="yes" className="mr-2" />
@@ -382,8 +410,9 @@ const ClientInformation = () => {
 
 
             {/* Fear of medical type procedures */}
+            {!shouldHideFields && (
             <div className="flex flex-col items-center mt-10">
-                <label className="block mb-2 text-left w-full sm:w-3/4">Do you have any fear of medical type procedures?</label>
+                <label className="block mb-2 text-left w-full sm:w-3/4">Do you have any fear of medical type procedures? <span className="text-red-600 ml-1">*</span> </label>
                 <div className="w-full sm:w-3/4"> 
                     <label className="flex items-center mb-2">
                         <Field type="radio" name="fearMedical" value="yes" className="mr-2" />
@@ -396,11 +425,12 @@ const ClientInformation = () => {
                     <ErrorMessage name="fearMedical" component="div" className="text-red-600" />
                 </div>
             </div>
-
+            )}
 
             {/* Prone to Fainting */}
+            {!shouldHideFields && (
             <div className="flex flex-col items-center mt-10">
-                <label className="block mb-2 text-left w-full sm:w-3/4">Are you prone to fainting?</label>
+                <label className="block mb-2 text-left w-full sm:w-3/4">Are you prone to fainting? <span className="text-red-600 ml-1">*</span> </label>
                 <div className="w-full sm:w-3/4"> 
                     <label className="flex items-center mb-2">
                         <Field type="radio" name="proneToFainting" value="yes" className="mr-2" />
@@ -417,40 +447,43 @@ const ClientInformation = () => {
                     <ErrorMessage name="proneToFainting" component="div" className="text-red-600" />
                 </div>
             </div>
-
+            )}
 
             {/* Medical Conditions Field */}
-        <div className="flex flex-col items-center mt-10">
-        <label className="block mb-2 text-left w-full sm:w-3/4">
-            Do you have any medical conditions? (Select all that apply)
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full sm:w-3/4">
-            {[
-            'None',
-            'Diabetes',
-            'Epilepsy',
-            'Heart Disease',
-            'Heavy Bleeding',
-            'Hepatitis',
-            'HIV/AIDS',
-            'Keloiding',
-            'Pregnancy'
-            ].map((condition) => (
-            <label key={condition} className="flex items-center">
-                <Field type="checkbox" name="medicalConditions" value={condition} className="mr-2" />
-                {condition}
+            {!shouldHideFields && (
+            <div className="flex flex-col items-center mt-10">
+            <label className="block mb-2 text-left w-full sm:w-3/4">
+                Do you have any medical conditions? (Select all that apply) <span className="text-red-600 ml-1">*</span>
             </label>
-            ))}
-        </div>
-        <ErrorMessage name="medicalConditions" component="div" className="text-red-600 w-full sm:w-3/4" />
-        </div>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full sm:w-3/4">
+                {[
+                'None',
+                'Diabetes',
+                'Epilepsy',
+                'Heart Disease',
+                'Heavy Bleeding',
+                'Hepatitis',
+                'HIV/AIDS',
+                'Keloiding',
+                'Pregnancy'
+                ].map((condition) => (
+                <label key={condition} className="flex items-center">
+                    <Field type="checkbox" name="medicalConditions" value={condition} className="mr-2" />
+                    {condition}
+                </label>
+                ))}
+            </div>
+            <ErrorMessage name="medicalConditions" component="div" className="text-red-600 w-full sm:w-3/4" />
+            </div>
+            )}
 
             
             {/* Accutane or HRT */}
+            {!shouldHideFields && (
             <div className="flex flex-col items-center mt-10">
             <label className="block mb-2 text-left w-full sm:w-3/4">
-                Have you in the past six months, or will you be in the following six months, be taking Accutane or Hormone Replacement Therapy (HRT)?
+                Have you in the past six months, or will you be in the following six months, be taking Accutane or Hormone Replacement Therapy (HRT)? 
+                <span className="text-red-600 ml-1">*</span>
             </label>
             <div className="flex flex-col items-start w-full sm:w-3/4">
                 <label className="flex items-center mb-2">
@@ -485,8 +518,8 @@ const ClientInformation = () => {
             {takingAccutaneOrHRT && (
                 <div className="mt-4 w-full sm:w-3/4 text-center">
                 <p className="text-blue-500 hover:underline mb-2">
-                    Please review our
-                    <a href="https://www.lynnloheide.com/post/accutane-and-piercings" className="text-blue-500" target="_blank" rel="noopener noreferrer"> Accutane and HRT guidelines</a>.
+                   
+                    <a href="https://www.lynnloheide.com/post/accutane-and-piercings" className="text-blue-500" target="_blank" rel="noopener noreferrer"> Please review our Accutane and HRT guidelines</a>.
                 </p>
                 </div>
             )}
@@ -499,19 +532,20 @@ const ClientInformation = () => {
                     name="takingAccutaneOrHRT"
                     className="mr-2"
                     />
-                    I confirm that I will be taking Accutane or HRT.
+                    I confirm that I will be taking Accutane or HRT. <span className="text-red-600 ml-1">*</span>
                 </label>
                 <ErrorMessage name="takingAccutaneOrHRT" component="div" className="text-red-600" />
                 </div>
             )}
             </div>
-
+            )}
 
             
 
             {/* On Antibiotics */}
+            {!shouldHideFields && (
             <div className="flex flex-col items-center mt-10">
-            <label className="block mb-2 text-left w-full sm:w-3/4">Are you currently on Antibiotics?</label>
+            <label className="block mb-2 text-left w-full sm:w-3/4">Are you currently on Antibiotics? <span className="text-red-600 ml-1">*</span> </label>
                 <div className="flex flex-col items-start w-full sm:w-3/4">
                 <label className="flex items-center mb-2">
                     <Field type="radio" name="onAntibiotics" value="yes" className="mr-2" />
@@ -524,19 +558,20 @@ const ClientInformation = () => {
                 <ErrorMessage name="onAntibiotics" component="div" className="text-red-600 " />
                 </div>
             </div>
-
+            )}
 
             {/* Submerge Agreement */}
+            {!shouldHideFields && (
             <div className="flex flex-col items-center mt-10">
             <div className="flex items-center w-full sm:w-3/4">
                 <Field type="checkbox" name="submergeAgreement" className="mr-2" />
                 <label htmlFor="submergeAgreement" className="text-left">
-                I will not submerge my piercing in any water for 3 months after getting pierced.
+                I will not submerge my piercing in any water for 3 months after getting pierced. <span className="text-red-600 ml-1">*</span>
                 </label>
             </div>
             <ErrorMessage name="submergeAgreement" component="div" className="text-red-600 w-full sm:w-3/4 mt-2" />
             </div>
-
+            )}
 
 
            
@@ -561,7 +596,7 @@ const ClientInformation = () => {
                 <div className="flex items-center w-full sm:w-3/4">
                     <Field type="checkbox" name="termsAndConditions" className="mr-2" />
                     <label htmlFor="termsAndConditions" className="text-left">
-                        I accept the Terms and Conditions.
+                        I accept the Terms and Conditions. <span className="text-red-600 ml-1">*</span>
                     </label>
                 </div>
                 <ErrorMessage name="termsAndConditions" component="div" className="text-red-600 w-full sm:w-3/4 mt-2" />
@@ -574,20 +609,67 @@ const ClientInformation = () => {
             </div>
            
 
-            {/* Submit Button */}
+            {/* Previous page Button */}
             <div className="flex flex-col sm:flex-row justify-between mt-6 mx-4 sm:mx-auto sm:w-3/4">
             <button
-                type="button"
-                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mb-2 sm:mb-0 sm:mr-4"
-                onClick={() => navigate('/service-selection')}
+            type="button"
+            className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mb-2 sm:mb-0 sm:mr-4"
+            onClick={() => navigate('/service-selection')}
             >
-                Previous
+            Previous
             </button>
-            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+
+              
+
+            <button
+                type="button"
+                className='bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600'
+                onClick={() => {
+                validateForm().then((errors) => {
+                    if (Object.keys(errors).length > 0) {
+                    // Mark all fields as touched
+                    setTouched({
+                        preferredName: true,
+                        lastName: true,
+                        pronunciation: true,
+                        pronouns: true,
+                        phoneNumber: true,
+                        email: true,
+                        address: true,
+                        city: true,
+                        postalCode: true,
+                        age: true,
+                        occupation: true,
+                        photo1: true,
+                        photo2: true,
+                        consent: false,
+                        negativeMetal:true,
+                        fearMedical: true,
+                        proneToFainting: true,
+                        medicalConditions: true,
+                        accutaneOrHRT: true, 
+                        takingAccutaneOrHRT: false,
+                        onAntibiotics: true,
+                        submergeAgreement: true,
+                        termsAndConditions: true,
+                        signature: true,
+                    });
+
+                    // Scroll to the first error
+                    const firstErrorField = Object.keys(errors)[0];
+                    const firstErrorElement = formRef.current.querySelector(`[name="${firstErrorField}"]`);
+
+                    if (firstErrorElement) {
+                        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    }
+                    submitForm(); // Submit the form
+                });
+                }}
+            >
                 Submit
             </button>
-</div>
-
+            </div>
           </Form>
         </FormLayout>
       )}
