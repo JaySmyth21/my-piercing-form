@@ -6,224 +6,222 @@ import FormLayout from './FormLayout'; // Import the layout
 import SignatureField from './SignatureField'; // Import your signature field
 
 const ClientInformation = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const formRef = useRef();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const formRef = useRef();
 
-  const selectedServices = location.state?.selectedServices || [];
-  useEffect(() => {
+    const selectedServices = location.state?.selectedServices || [];
+    useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-  const jewelryChanges = [
+    }, []);
+    const jewelryChanges = [
     'Jewelry Change (One Change)', 'Jewelry Change (Two Changes)', 
     'Jewelry Change (Three Changes)', 'Jewelry Change (Four Changes)', 
     'Jewelry Change (Five Changes)', 'Jewelry Change (Six Changes)', 
     'Jewelry Change (Seven Changes)', 'Jewelry Change (Eight Changes)'
-  ];
+    ];
 
-  const jewelryDownsizes = [
+    const jewelryDownsizes = [
     'Jewelry Downsize (One)', 'Jewelry Downsize (Two)', 
     'Jewelry Downsize (Three)', 'Jewelry Downsize (Four)', 
     'Jewelry Downsize (Five)', 'Jewelry Downsize (Six)', 
     'Jewelry Downsize (Seven)', 'Jewelry Downsize (Eight)',
-  ];
+    ];
 
-  const other = [
+    const other = [
     'Embeded Jewelry', 'Jewelry Removal (General)', 
     'Jewelry Removal (Dermal)', 'General Checkup', 'Cheek/Dahlia Consultation'
-  ];
+    ];
 
-  // Check if any selected service is from Jewelry Change, Downsize, or Other
-  const shouldHideFields = selectedServices.some(service =>
+    // Check if any selected service is from Jewelry Change, Downsize, or Other
+    const shouldHideFields = selectedServices.some(service =>
     jewelryChanges.includes(service) ||
     jewelryDownsizes.includes(service) ||
     other.includes(service)
-  );
+    );
 
-  // States for the first photo capture
-  const [imagePreview1, setImagePreview1] = useState(null);
-  const [cameraOpened1, setCameraOpened1] = useState(false);
-  const [photoCaptured1, setPhotoCaptured1] = useState(false);
-  const videoRef1 = useRef(null);
-  const canvasRef1 = useRef(null);
-  const streamRef1 = useRef(null);
+    // States for the first photo capture
+    const [imagePreview1, setImagePreview1] = useState(null);
+    const [cameraOpened1, setCameraOpened1] = useState(false);
+    const [photoCaptured1, setPhotoCaptured1] = useState(false);
+    const videoRef1 = useRef(null);
+    const canvasRef1 = useRef(null);
+    const streamRef1 = useRef(null);
 
-  // States for the second photo capture
-  const [imagePreview2, setImagePreview2] = useState(null);
-  const [cameraOpened2, setCameraOpened2] = useState(false);
-  const [photoCaptured2, setPhotoCaptured2] = useState(false);
-  const videoRef2 = useRef(null);
-  const canvasRef2 = useRef(null);
-  const streamRef2 = useRef(null);
+    // States for the second photo capture
+    const [imagePreview2, setImagePreview2] = useState(null);
+    const [cameraOpened2, setCameraOpened2] = useState(false);
+    const [photoCaptured2, setPhotoCaptured2] = useState(false);
+    const videoRef2 = useRef(null);
+    const canvasRef2 = useRef(null);
+    const streamRef2 = useRef(null);
 
-  const [takingAccutaneOrHRT, setTakingAccutaneOrHRT] = useState(false);
+    
 
-  // Function to access the camera for the first capture
-  const getVideo1 = async () => {
-    try {
-      streamRef1.current = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef1.current.srcObject = streamRef1.current;
-      setCameraOpened1(true);
-      setPhotoCaptured1(false);
-    } catch (err) {
-      console.error("Error accessing camera: ", err);
-    }
-  };
+    // Function to access the camera for the first capture
+    const getVideo1 = async () => {
+        try {
+            streamRef1.current = await navigator.mediaDevices.getUserMedia({ video: true });
+            videoRef1.current.srcObject = streamRef1.current;
+            setCameraOpened1(true);
+            setPhotoCaptured1(false);
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+        }
+    };
 
-  // Function to capture the photo for the first capture
-  const takePicture1 = (setFieldValue) => {
-    const canvas = canvasRef1.current;
-    const video = videoRef1.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    const imageData = canvas.toDataURL('image/png');
-    setImagePreview1(imageData);
-    setPhotoCaptured1(true);
+    // Function to capture the photo for the first capture
+    const takePicture1 = (setFieldValue) => {
+        const canvas = canvasRef1.current;
+        const video = videoRef1.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/png');
+        setImagePreview1(imageData);
+        setPhotoCaptured1(true);
 
-    // Set the captured photo value in Formik state
-    setFieldValue('photo1', imageData);
+        // Set the captured photo value in Formik state
+        setFieldValue('photo1', imageData);
 
-    // Stop the camera stream after capturing the photo
-    if (streamRef1.current) {
-      streamRef1.current.getTracks().forEach(track => track.stop());
-      setCameraOpened1(false);
-    }
-  };
+        // Stop the camera stream after capturing the photo
+        if (streamRef1.current) {
+            streamRef1.current.getTracks().forEach(track => track.stop());
+            setCameraOpened1(false);
+        }
+    };
 
-  // Function to retake the photo for the first capture
-  const retakePicture1 = (setFieldValue) => {
-    setImagePreview1(null);
-    setPhotoCaptured1(false);
-    getVideo1();
-    setFieldValue('photo1', ''); // Clear the photo value in Formik state
-  };
+    // Function to retake the photo for the first capture
+    const retakePicture1 = (setFieldValue) => {
+        setImagePreview1(null);
+        setPhotoCaptured1(false);
+        getVideo1();
+        setFieldValue('photo1', ''); // Clear the photo value in Formik state
+    };
 
-  // Function to access the camera for the second capture
-  const getVideo2 = async () => {
-    try {
-      streamRef2.current = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef2.current.srcObject = streamRef2.current;
-      setCameraOpened2(true);
-      setPhotoCaptured2(false);
-    } catch (err) {
-      console.error("Error accessing camera: ", err);
-    }
-  };
+    // Function to access the camera for the second capture
+    const getVideo2 = async () => {
+        try {
+            streamRef2.current = await navigator.mediaDevices.getUserMedia({ video: true });
+            videoRef2.current.srcObject = streamRef2.current;
+            setCameraOpened2(true);
+            setPhotoCaptured2(false);
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+        }
+    };
 
-  // Function to capture the photo for the second capture
-  const takePicture2 = (setFieldValue) => {
-    const canvas = canvasRef2.current;
-    const video = videoRef2.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    const imageData = canvas.toDataURL('image/png');
-    setImagePreview2(imageData);
-    setPhotoCaptured2(true);
+    // Function to capture the photo for the second capture
+    const takePicture2 = (setFieldValue) => {
+        const canvas = canvasRef2.current;
+        const video = videoRef2.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/png');
+        setImagePreview2(imageData);
+        setPhotoCaptured2(true);
 
-    // Set the captured photo value in Formik state
-    setFieldValue('photo2', imageData);
+        // Set the captured photo value in Formik state
+        setFieldValue('photo2', imageData);
 
-    // Stop the camera stream after capturing the photo
-    if (streamRef2.current) {
-      streamRef2.current.getTracks().forEach(track => track.stop());
-      setCameraOpened2(false);
-    }
-  };
+        // Stop the camera stream after capturing the photo
+        if (streamRef2.current) {
+            streamRef2.current.getTracks().forEach(track => track.stop());
+            setCameraOpened2(false);
+        }
+    };
 
-  // Function to retake the photo for the second capture
-  const retakePicture2 = (setFieldValue) => {
-    setImagePreview2(null);
-    setPhotoCaptured2(false);
-    getVideo2();
-    setFieldValue('photo2', ''); // Clear the photo value in Formik state
-  };
+    // Function to retake the photo for the second capture
+    const retakePicture2 = (setFieldValue) => {
+        setImagePreview2(null);
+        setPhotoCaptured2(false);
+        getVideo2();
+        setFieldValue('photo2', ''); // Clear the photo value in Formik state
+        };
 
-  const validationSchema = Yup.object({
-    preferredName: Yup.string().required('Preferred Name is required'),
-    lastName: Yup.string().required('Last Name is required'),
-    pronunciation: Yup.string(),
-    pronouns: Yup.string(),
-    phoneNumber: Yup.string()
-        .required('Phone Number is required')
-        .matches(/^[0-9]+$/, 'Phone Number should contain only digits'),
-    email: Yup.string().email('Invalid email format').required('Email is required'),
-    address: Yup.string().required('Address is required'),
-    city: Yup.string().required('City is required'),
-    postalCode: Yup.string().required('Postal Code is required'),
-    age: Yup.number()
-        .required('Age is required')
-        .positive('Age must be a positive number')
-        .integer('Age must be an integer'),
-    photo1: Yup.string().required('A photo is required for the first field'),
-    photo2: Yup.string().required('A photo is required for the second field'),
-    consent: Yup.boolean().oneOf([true], 'You must confirm you are of the age of consent or have parental consent.'),
-    negativeMetal: Yup.string().required('Please select if you have reacted negatively to metal jewelry.'),
-    fearMedical: Yup.string().required('Please select if you have any fear of medical type procedures.'),
-    proneToFainting: Yup.string().required('Please select if you are prone to fainting.'),
-    medicalConditions: Yup.array().min(1, 'At least one medical condition must be selected.'),
-    accutaneOrHRT: Yup.string()
-    .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
-    .required('Please select Yes or No for Accutane or HRT.'),
-    takingAccutaneOrHRT: Yup.boolean()
-    .nullable()
-    .test(
-      'is-accutane-confirmed',
-      'You must confirm that you will be taking Accutane or HRT.',
-      function (value) {
-        const { accutaneOrHRT } = this.parent;
-        return accutaneOrHRT === 'yes' ? value === true : true;
-      }
-    ),
-    onAntibiotics: Yup.string().required('Please select if you are on antibiotics.'),
-    submergeAgreement: Yup.boolean().oneOf([true], 'You must confirm you will not submerge you piercing for 3 months after getting pierced.'),
-    termsAndConditions: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions.'),
-    signature: Yup.string().required('Signature is required')
-});
+        const validationSchema = Yup.object({
+        preferredName: Yup.string().required('Preferred Name is required'),
+        lastName: Yup.string().required('Last Name is required'),
+        pronunciation: Yup.string(),
+        pronouns: Yup.string(),
+        phoneNumber: Yup.string()
+            .required('Phone Number is required')
+            .matches(/^[0-9]+$/, 'Phone Number should contain only digits'),
+        email: Yup.string().email('Invalid email format').required('Email is required'),
+        address: Yup.string().required('Address is required'),
+        city: Yup.string().required('City is required'),
+        postalCode: Yup.string().required('Postal Code is required'),
+        age: Yup.number()
+            .required('Age is required')
+            .positive('Age must be a positive number')
+            .integer('Age must be an integer'),
+        photo1: Yup.string().required('A photo is required for the first field'),
+        photo2: Yup.string().required('A photo is required for the second field'),
+        consent: Yup.boolean().oneOf([true], 'You must confirm you are of the age of consent or have parental consent.'),
+        negativeMetal: Yup.string().required('Please select if you have reacted negatively to metal jewelry.'),
+        fearMedical: Yup.string().required('Please select if you have any fear of medical type procedures.'),
+        proneToFainting: Yup.string().required('Please select if you are prone to fainting.'),
+        medicalConditions: Yup.array().min(1, 'At least one medical condition must be selected.'),
+        accutaneOrHRT: Yup.string()
+        .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
+        .required('Please select Yes or No for Accutane or HRT.'),
+        takingAccutaneOrHRT: Yup.boolean()
+        .nullable()
+        .test(
+            'is-accutane-confirmed',
+            'You must confirm that you will be taking Accutane or HRT.',
+            function (value) {
+            const { accutaneOrHRT } = this.parent;
+            return accutaneOrHRT === 'yes' ? value === true : true;
+            }
+        ),
+        onAntibiotics: Yup.string().required('Please select if you are on antibiotics.'),
+        submergeAgreement: Yup.boolean().oneOf([true], 'You must confirm you will not submerge you piercing for 3 months after getting pierced.'),
+        termsAndConditions: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions.'),
+        signature: Yup.string().required('Signature is required')
+    });
 
-
-
-  return (
+    return (
         <Formik
-        initialValues={{
-        preferredName: '',
-        lastName: '',
-        pronunciation: '',
-        pronouns: '',
-        phoneNumber: '',
-        email: '',
-        address: '',
-        city: '',
-        postalCode: '',
-        age: '',
-        occupation: '',
-        photo1: '',
-        photo2: '',
-        consent: false,
-        negativeMetal: '',
-        fearMedical: '',
-        proneToFainting: '',
-        medicalConditions: [],
-        accutaneOrHRT: '', 
-        takingAccutaneOrHRT: false,
-        onAntibiotics: '',
-        submergeAgreement: false,
-        termsAndConditions: false,
-        signature: '',
-    }}
+            initialValues={{
+            preferredName: '',
+            lastName: '',
+            pronunciation: '',
+            pronouns: '',
+            phoneNumber: '',
+            email: '',
+            address: '',
+            city: '',
+            postalCode: '',
+            age: '',
+            occupation: '',
+            photo1: '',
+            photo2: '',
+            consent: false,
+            negativeMetal: '',
+            fearMedical: '',
+            proneToFainting: '',
+            medicalConditions: [],
+            accutaneOrHRT: '', 
+            takingAccutaneOrHRT: false,
+            onAntibiotics: '',
+            submergeAgreement: false,
+            termsAndConditions: false,
+            signature: '',
+            }}
     
     
-    validationSchema={validationSchema}
-    
-    onSubmit={(values) => {
-        console.log('Formik values:', values); // Log all Formik values
-        console.log('Form submitted:', values);
-        navigate('/confirmation', { state: { formData: values } });  // Navigate to confirmation page
-
-    }}
-    >
+            validationSchema={validationSchema}
         
+            onSubmit={(values) => {
+                console.log('Formik values:', values); // Log all Formik values
+                console.log('Form submitted:', values);
+                navigate('/confirmation', { state: { formData: values } });  // Navigate to confirmation page
+
+            }}
+        >   
+
         {({ validateForm, errors, setFieldValue, submitForm, touched, setTouched, values}) => (
             
         <FormLayout>
@@ -696,10 +694,6 @@ const ClientInformation = () => {
                         }
                     });
                 }}
-                
-                
-                  
-                  
             >
                 Submit
             </button>
