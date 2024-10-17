@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useLocation} from 'react-router-dom';
@@ -11,7 +11,9 @@ const ClientInformation = () => {
   const formRef = useRef();
 
   const selectedServices = location.state?.selectedServices || [];
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const jewelryChanges = [
     'Jewelry Change (One Change)', 'Jewelry Change (Two Changes)', 
     'Jewelry Change (Three Changes)', 'Jewelry Change (Four Changes)', 
@@ -154,7 +156,6 @@ const ClientInformation = () => {
         .required('Age is required')
         .positive('Age must be a positive number')
         .integer('Age must be an integer'),
-    occupation: Yup.string().required('Occupation/Sport is required'),
     photo1: Yup.string().required('A photo is required for the first field'),
     photo2: Yup.string().required('A photo is required for the second field'),
     consent: Yup.boolean().oneOf([true], 'You must confirm you are of the age of consent or have parental consent.'),
@@ -163,15 +164,18 @@ const ClientInformation = () => {
     proneToFainting: Yup.string().required('Please select if you are prone to fainting.'),
     medicalConditions: Yup.array().min(1, 'At least one medical condition must be selected.'),
     accutaneOrHRT: Yup.string()
-      .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
-      .required('Please select Yes or No for Accutane or HRT.'),
-
+    .oneOf(['yes', 'no'], 'Please select Yes or No for Accutane or HRT.')
+    .required('Please select Yes or No for Accutane or HRT.'),
     takingAccutaneOrHRT: Yup.boolean()
-      .when('accutaneOrHRT', (accutaneOrHRT, schema) => {
-        return accutaneOrHRT === 'yes'
-          ? schema.oneOf([true], 'You must confirm that you will be taking Accutane or HRT.')
-          : schema.notRequired();
-      }),
+    .nullable()
+    .test(
+      'is-accutane-confirmed',
+      'You must confirm that you will be taking Accutane or HRT.',
+      function (value) {
+        const { accutaneOrHRT } = this.parent;
+        return accutaneOrHRT === 'yes' ? value === true : true;
+      }
+    ),
     onAntibiotics: Yup.string().required('Please select if you are on antibiotics.'),
     submergeAgreement: Yup.boolean().oneOf([true], 'You must confirm you will not submerge you piercing for 3 months after getting pierced.'),
     termsAndConditions: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions.'),
@@ -213,13 +217,15 @@ const ClientInformation = () => {
     validationSchema={validationSchema}
     
     onSubmit={(values) => {
+        console.log('Formik values:', values); // Log all Formik values
         console.log('Form submitted:', values);
         navigate('/confirmation', { state: { formData: values } });  // Navigate to confirmation page
 
     }}
     >
         
-        {({ validateForm, errors, setFieldValue, submitForm, touched, setTouched }) => (
+        {({ validateForm, errors, setFieldValue, submitForm, touched, setTouched, values}) => (
+            
         <FormLayout>
           <Form ref={formRef}>
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Client Information</h2>
@@ -306,7 +312,11 @@ const ClientInformation = () => {
                 Retake Photo
                 </button>
             )}
-
+            <Field
+                type="hidden"
+                name="photo1"
+                value={imagePreview1 || ''} // Ensure it captures the image preview or is empty
+            />
             <canvas ref={canvasRef1} style={{ display: 'none' }} />
             <ErrorMessage name="photo1" component="div" className="text-red-500 mt-1" />
             </div>
@@ -363,6 +373,7 @@ const ClientInformation = () => {
                 </button>
             )}
             <canvas ref={canvasRef2} style={{ display: 'none' }} />
+            <ErrorMessage name="photo2" component="div" className="text-red-500 mt-1" />
             </div>
 
             
@@ -478,69 +489,72 @@ const ClientInformation = () => {
             )}
 
             
-            {/* Accutane or HRT */}
-            {!shouldHideFields && (
-            <div className="flex flex-col items-center mt-10">
-            <label className="block mb-2 text-left w-full sm:w-3/4">
-                Have you in the past six months, or will you be in the following six months, be taking Accutane or Hormone Replacement Therapy (HRT)? 
-                <span className="text-red-600 ml-1">*</span>
+             {/* Accutane or HRT */}
+        {!shouldHideFields && (
+          <div className="flex flex-col items-center mt-10">
+          <label className="block mb-2 text-left w-full sm:w-3/4">
+            Have you in the past six months, or will you be in the following six months, be taking Accutane or Hormone Replacement Therapy (HRT)? 
+            <span className="text-red-600 ml-1">*</span>
+          </label>
+          <div className="flex flex-col items-start w-full sm:w-3/4">
+            <label className="flex items-center mb-2">
+              <Field
+                type="radio"
+                name="accutaneOrHRT"
+                value="yes"
+                className="mr-2"
+                onChange={() => {
+                  setFieldValue('accutaneOrHRT', 'yes');
+                }}
+              />
+              Yes
             </label>
-            <div className="flex flex-col items-start w-full sm:w-3/4">
-                <label className="flex items-center mb-2">
-                <Field
-                    type="radio"
-                    name="accutaneOrHRT"
-                    value="yes"
-                    className="mr-2"
-                    onChange={() => {
-                    setFieldValue('accutaneOrHRT', 'yes');
-                    setTakingAccutaneOrHRT(true);
-                    }}
-                />
-                Yes
-                </label>
-                <label className="flex items-center mb-2">
-                <Field
-                    type="radio"
-                    name="accutaneOrHRT"
-                    value="no"
-                    className="mr-2"
-                    onChange={() => {
-                    setFieldValue('accutaneOrHRT', 'no');
-                    setTakingAccutaneOrHRT(false);
-                    }}
-                />
-                No
-                </label>
-                <ErrorMessage name="accutaneOrHRT" component="div" className="text-red-600" />
+            <label className="flex items-center mb-2">
+              <Field
+                type="radio"
+                name="accutaneOrHRT"
+                value="no"
+                className="mr-2"
+                onChange={() => {
+                  setFieldValue('accutaneOrHRT', 'no');
+                  setFieldValue('takingAccutaneOrHRT', null); // Reset checkbox state if "no"
+                }}
+              />
+              No
+            </label>
+            <ErrorMessage name="accutaneOrHRT" component="div" className="text-red-600" />
+          </div>
+  
+          {values.accutaneOrHRT === 'yes' && (
+            <div className="mt-4 w-full sm:w-3/4 text-center">
+              <p className="text-blue-500 hover:underline mb-2">
+                <a
+                  href="https://www.lynnloheide.com/post/accutane-and-piercings"
+                  className="text-blue-500"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Please review our Accutane and HRT guidelines
+                </a>.
+              </p>
             </div>
-
-            {takingAccutaneOrHRT && (
-                <div className="mt-4 w-full sm:w-3/4 text-center">
-                <p className="text-blue-500 hover:underline mb-2">
-                   
-                    <a href="https://www.lynnloheide.com/post/accutane-and-piercings" className="text-blue-500" target="_blank" rel="noopener noreferrer"> Please review our Accutane and HRT guidelines</a>.
-                </p>
-                </div>
-            )}
-
-            {takingAccutaneOrHRT && (
-                <div className="flex flex-col items-start w-full sm:w-3/4 mt-4">
-                <label className="flex items-center mb-2">
-                    <Field
-                    type="checkbox"
-                    name="takingAccutaneOrHRT"
-                    className="mr-2"
-                    />
-                    I confirm that I will be taking Accutane or HRT. <span className="text-red-600 ml-1">*</span>
-                </label>
-                <ErrorMessage name="takingAccutaneOrHRT" component="div" className="text-red-600" />
-                </div>
-            )}
+          )}
+  
+          {values.accutaneOrHRT === 'yes' && (
+            <div className="flex flex-col items-start w-full sm:w-3/4 mt-4">
+              <label className="flex items-center mb-2">
+                <Field
+                  type="checkbox"
+                  name="takingAccutaneOrHRT"
+                  className="mr-2"
+                />
+                I confirm that I will be taking Accutane or HRT. <span className="text-red-600 ml-1">*</span>
+              </label>
+              <ErrorMessage name="takingAccutaneOrHRT" component="div" className="text-red-600" />
             </div>
-            )}
-
-            
+          )}
+        </div>
+        )}
 
             {/* On Antibiotics */}
             {!shouldHideFields && (
@@ -625,47 +639,67 @@ const ClientInformation = () => {
                 type="button"
                 className='bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600'
                 onClick={() => {
-                validateForm().then((errors) => {
-                    if (Object.keys(errors).length > 0) {
-                    // Mark all fields as touched
-                    setTouched({
-                        preferredName: true,
-                        lastName: true,
-                        pronunciation: true,
-                        pronouns: true,
-                        phoneNumber: true,
-                        email: true,
-                        address: true,
-                        city: true,
-                        postalCode: true,
-                        age: true,
-                        occupation: true,
-                        photo1: true,
-                        photo2: true,
-                        consent: false,
-                        negativeMetal:true,
-                        fearMedical: true,
-                        proneToFainting: true,
-                        medicalConditions: true,
-                        accutaneOrHRT: true, 
-                        takingAccutaneOrHRT: false,
-                        onAntibiotics: true,
-                        submergeAgreement: true,
-                        termsAndConditions: true,
-                        signature: true,
+                    validateForm().then((errors) => {
+                        console.log('Errors:', errors); // Log errors
+                
+                        if (Object.keys(errors).length > 0) {
+                            // Mark all fields as touched dynamically
+                            setTouched(
+                                Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+                            );
+                
+                            // Log first error field for debugging
+                            const firstErrorField = Object.keys(errors)[0];
+                            console.log('First error field:', firstErrorField);
+                
+                            // General scroll logic for the first error
+                            const firstErrorElement = formRef.current?.querySelector(
+                                `[name="${firstErrorField}"]`
+                            );
+                
+                            if (firstErrorElement) {
+                                console.log('First error element:', firstErrorElement); // Check if element exists
+                                firstErrorElement.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                });
+                                
+                            }
+                
+                            // Custom handling for photo1
+                            if (firstErrorField === 'photo1') {
+                                const cameraElement = formRef.current?.querySelector(`[name="photo1"]`);
+                                if (cameraElement) {
+                                    cameraElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                                const cameraSection = videoRef1.current || canvasRef1.current;
+                                if (cameraSection) {
+                                    cameraSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }
+                
+                            // Custom handling for photo2
+                            if (firstErrorField === 'photo2') {
+                                const cameraElement = formRef.current?.querySelector(`[name="photo2"]`);
+                                if (cameraElement) {
+                                    cameraElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                                const cameraSection = videoRef2.current || canvasRef2.current;
+                                if (cameraSection) {
+                                    cameraSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }
+                        }
+                
+                        if (Object.keys(errors).length === 0) {
+                            submitForm(); // Only submit if no errors
+                        }
                     });
-
-                    // Scroll to the first error
-                    const firstErrorField = Object.keys(errors)[0];
-                    const firstErrorElement = formRef.current.querySelector(`[name="${firstErrorField}"]`);
-
-                    if (firstErrorElement) {
-                        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    }
-                    submitForm(); // Submit the form
-                });
                 }}
+                
+                
+                  
+                  
             >
                 Submit
             </button>
