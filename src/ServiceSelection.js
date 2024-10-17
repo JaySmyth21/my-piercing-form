@@ -26,7 +26,7 @@ const ServiceSelection = () => {
     'Oral': [
       'Labret Piercing (16+)', 'Vertical Labret Piercing (16+)', 'Philtrum/Medusa Piercing (16+)', 'Vertical Philtrum (Jestrum) Piercing (16+)',
       'Madonna Piercing (16+)', 'Monroe Piercing (16+)', 'Cheek Piercing (16+)', 'Dahlia Piercing (16+)', 'Snake Bites Piercing (16+)', 'Angel Bites Piercing (16+)',
-      'Inverted Fangs Piercing (16+)',  'Tongue Piercing (16+)', 'Tongue Web Piercing (16+)',
+      'Inverted Fangs Piercing (16+)', 'Tongue Piercing (16+)', 'Tongue Web Piercing (16+)',
     ],
     
     'Body': [
@@ -46,16 +46,16 @@ const ServiceSelection = () => {
   ];
 
   let jewelryDownsizes = [
-    'Jewelry Downsize (One)', 'Jewelry Downsize (Two)', 
-    'Jewelry Downsize (Three)', 'Jewelry Downsize (Four)', 
-    'Jewelry Downsize (Five)', 'Jewelry Downsize (Six)', 
-    'Jewelry Downsize (Seven)', 'Jewelry Downsize (Eight)', 
+    'Jewelry Downsize (One Downsize)', 'Jewelry Downsize (Two Downsize)', 
+    'Jewelry Downsize (Three Downsize)', 'Jewelry Downsize (Four Downsize)', 
+    'Jewelry Downsize (Five Downsize)', 'Jewelry Downsize (Six Downsize)', 
+    'Jewelry Downsize (Seven Downsize)', 'Jewelry Downsize (Eight Downsize)', 
 
   ];
 
   let other = [
     'Embeded Jewelry', 'Jewelry Removal (General)', 'Jewelry Removal (Dermal)', 'General Checkup',
-    'Cheek/Dahlia Consultation'
+    'Cheek/Dahlia Consultation', 'I lost a part of my jewelry', 'Shop Jewelry'
   ];
 
   let specificOther = [ 'Embeded Jewelry', 'Jewelry Removal (General)', 'Jewelry Removal (Dermal)', 'General Checkup' ];
@@ -95,8 +95,30 @@ const ServiceSelection = () => {
     }}
   >
   
-  {({ errors, touched, values }) => {
-    const isMaxServicesSelected = values.services.length >= 3;
+  {({ errors, touched, values, setFieldValue}) => {
+  const isMaxServicesSelected = values.services.length >= 3;
+  const lostJewelrySelected = values.services.includes('I lost a part of my jewelry');
+  const shopJewelrySelected = values.services.includes('Shop Jewelry');
+  
+  // Check if any other checkbox is selected, excluding "I lost a part of my jewelry" and "Shop Jewelry"
+  const otherCheckboxSelected = values.services.some(service => 
+    !['I lost a part of my jewelry', 'Shop Jewelry'].includes(service)
+  );
+
+  // Disable all services if "I lost a part of my jewelry" or "Shop Jewelry" is selected, except those two
+  const disableOtherServices = lostJewelrySelected || shopJewelrySelected;
+
+  // Disable "I lost a part of my jewelry" and "Shop Jewelry" if any other service is selected
+  const disableSpecialServices = otherCheckboxSelected;
+
+  // Handler to allow toggling of "I lost a part of my jewelry" or "Shop Jewelry" checkboxes
+  const handleServiceSelection = (service) => {
+    if (values.services.includes(service)) {
+      setFieldValue('services', values.services.filter(s => s !== service)); // Unselect if selected
+    } else {
+      setFieldValue('services', [...values.services, service]); // Select if not selected
+    }
+  };
 
     return (
       <FormLayout>
@@ -119,7 +141,7 @@ const ServiceSelection = () => {
                             name="services"
                             value={service}
                             className="mr-2"
-                            disabled={
+                            disabled={ disableOtherServices ||
                               (isMaxServicesSelected && !values.services.includes(service)) ||
                               (selectedPiercer === 'Jennica' &&
                                 !['Conch Piercing (14+)', 'Helix Piercing (13+)', 'Hidden Helix Piercing (16+)'].includes(service))
@@ -136,7 +158,7 @@ const ServiceSelection = () => {
 
             {/* Second Column: Oral, Body, Below the Belt */}
             <div className="col-span-1 px-2">
-              <h3 className="text-xl font-semibold mb-4"></h3>
+              <div className="mt-10"></div>
               <div className="space-y-6">
                 {Object.entries(piercings).slice(3).map(([category, services]) => (
                   <div key={category}>
@@ -149,7 +171,7 @@ const ServiceSelection = () => {
                             name="services"
                             value={service}
                             className="mr-2"
-                            disabled={
+                            disabled={ disableOtherServices ||
                               (isMaxServicesSelected && !values.services.includes(service)) ||
                               (selectedPiercer === 'Jennica' &&
                                 !['Conch Piercing (14+)', 'Helix Piercing (13+)', 'Hidden Helix Piercing (16+)'].includes(service))
@@ -166,7 +188,7 @@ const ServiceSelection = () => {
 
             {/* Third Column: Jewelry Changes and Downsizes */}
             <div className="col-span-1 px-2">
-              <h3 className="text-xl font-semibold mb-4"></h3>
+                <div className="mt-10"></div>
               <div className="space-y-6">
                 <h4 className="text-lg font-semibold mb-2">Jewelry Changes</h4>
                 <div className="space-y-2">
@@ -177,7 +199,7 @@ const ServiceSelection = () => {
                         name="services"
                         value={service}
                         className="mr-2"
-                        disabled={isMaxServicesSelected && !values.services.includes(service)}
+                        disabled={disableOtherServices || (isMaxServicesSelected && !values.services.includes(service))}
                       />
                       {service}
                     </label>
@@ -193,7 +215,7 @@ const ServiceSelection = () => {
                         name="services"
                         value={service}
                         className="mr-2"
-                        disabled={isMaxServicesSelected && !values.services.includes(service)}
+                        disabled={disableOtherServices || (isMaxServicesSelected && !values.services.includes(service))}
                       />
                       {service}
                     </label>
@@ -204,13 +226,36 @@ const ServiceSelection = () => {
                 <div className="space-y-2">
                   {other.map((service, index) => (
                     <label key={index} className="flex items-center">
-                      <Field
-                        type="checkbox"
-                        name="services"
-                        value={service}
-                        className="mr-2"
-                        disabled={isMaxServicesSelected && !values.services.includes(service)}
-                      />
+                    <Field
+                    type="checkbox"
+                    name="services"
+                    value={service}
+                    className="mr-2"
+                    disabled={
+                        // Disable "I lost a part of my jewelry" if "Shop Jewelry" is selected
+                        (values.services.includes('Shop Jewelry') && service === 'I lost a part of my jewelry') ||
+
+                        // Disable "Shop Jewelry" if "I lost a part of my jewelry" is selected
+                        (values.services.includes('I lost a part of my jewelry') && service === 'Shop Jewelry') ||
+
+                        // If either service is selected, disable all other services except these two
+                        (lostJewelrySelected || shopJewelrySelected) && 
+                        !['I lost a part of my jewelry', 'Shop Jewelry'].includes(service) ||
+
+                        // Disable other services if any other service is selected
+                        (otherCheckboxSelected && ['I lost a part of my jewelry', 'Shop Jewelry'].includes(service)) ||
+
+                        // Disable other services if the maximum limit is reached
+                        (isMaxServicesSelected && !values.services.includes(service)) ||
+
+                        // For services in the other array, disable if the limit of selected services from this array has been reached
+                        (other.includes(service) && 
+                            values.services.filter(s => other.includes(s)).length >= 3 &&
+                            !values.services.includes(service))
+                    }
+                    onChange={() => handleServiceSelection(service)}
+                />
+
                       {service}
                     </label>
                   ))}
@@ -235,6 +280,19 @@ const ServiceSelection = () => {
             </div>
           )}
 
+            {/* Conditionally show text box if "I lost a part of my jewelry" is selected */}
+            {lostJewelrySelected && (
+            <div className="mt-4">
+                <label className="block text-lg font-medium">Please describe the missing jewelry part</label>
+                <Field
+                type="text"
+                name="lostJewelryDetails"
+                placeholder="E.g., I lost the ball or backing"
+                className="mt-2 p-2 border border-gray-300 rounded w-full"
+                />
+                <ErrorMessage name="lostJewelryDetails" component="div" className="text-red-500 mt-2" />
+            </div>
+            )}
           {/* Display errors */}
           {errors.services && touched.services ? (
             <div className="text-red-500 mt-2">{errors.services}</div>
