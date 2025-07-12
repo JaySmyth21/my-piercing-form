@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { storage } from "./firebaseConfig";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 const Confirmation = () => {
   const location = useLocation();
@@ -10,6 +12,12 @@ const Confirmation = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  const uploadBase64Image = async (base64Data, path) => {
+    const storageRef = ref(storage, path);
+    await uploadString(storageRef, base64Data, "data_url");
+    return await getDownloadURL(storageRef); // ✅ returns the viewable link
+  };
 
   const handleSubmit = useCallback(async () => {
     if (!formData) return;
@@ -30,12 +38,40 @@ const Confirmation = () => {
 
       const { photo1, photo2, signature, ...cleanFormData } = formData;
       const fullName = `${formData.preferredName} ${formData.lastName}`.trim();
+      const timestamp = Date.now();
+      const folderName = `${fullName}_${timestamp}`;
+      const basePath = `photos/${folderName}`;
+
+      let photo1URL = "";
+let photo2URL = "";
+let signatureURL = "";
+
+try {
+  // Upload photo1 and get URL
+  await uploadBase64Image(photo1, `${basePath}/photo1.jpg`);
+  photo1URL = await getDownloadURL(ref(storage, `${basePath}/photo1.jpg`));
+
+  // Upload photo2 (if provided) and get URL
+  if (photo2) {
+    await uploadBase64Image(photo2, `${basePath}/photo2.jpg`);
+    photo2URL = await getDownloadURL(ref(storage, `${basePath}/photo2.jpg`));
+  }
+
+  // Upload signature and get URL
+  await uploadBase64Image(signature, `${basePath}/signature.jpg`);
+  signatureURL = await getDownloadURL(ref(storage, `${basePath}/signature.jpg`));
+} catch (err) {
+  console.log("❌ Upload error:", err);
+}
 
       await axios.post("http://localhost:5000/api/create-visit", {
         ...cleanFormData,
         serviceIds,
         locationId: "C54Z3Pj94nj6gTSTpCxD",
         name: fullName,
+        photo1URL,
+        photo2URL,
+        signatureURL,
       });
 
       setSubmitSuccess(true);
@@ -57,6 +93,7 @@ const Confirmation = () => {
 
     handleSubmit(); // ✅ auto-submit on load
   }, [formData, handleSubmit, navigate]);
+
 
 
   return (

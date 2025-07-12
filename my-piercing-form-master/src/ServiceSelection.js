@@ -43,6 +43,8 @@ const ServiceSelection = () => {
     try {
       const res = await axios.get("http://localhost:5000/api/services");
       const allServices = res.data;
+      
+
 
       // ✅ Filter active, non-category services supported by the selected piercer
       const filtered = allServices
@@ -81,7 +83,7 @@ const ServiceSelection = () => {
         if (!grouped[categoryId]) grouped[categoryId] = [];
         grouped[categoryId].push(service);
       });
-
+      
       setServicesGrouped(grouped);
       setCategories(categories);
       setServices(filtered);

@@ -21,4 +21,8 @@ module.exports = {
   eaten: "gkK5rbLMrryXJZLJECbw",
   decisionImpare: "qwRgqGs50TcwiLCeOlnj",
   postalCode: "Q7CVGxzGX39hgEk0bvYF",
+  photo1URL: "C12ono8IEMOpjj41Lmsv",       
+  photo2URL: "JLraVMLSj46zT3UsgHlw",       
+  signatureURL: "ILFN8OsAZS0BTOsfo2fs", 
+
 };
