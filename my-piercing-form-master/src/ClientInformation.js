@@ -134,7 +134,7 @@ const ClientInformation = () => {
         const [imagePreview2, setImagePreview2] = photo2.preview;
 
 
-console.log("🔍 Age:", values.age, "Show photo2?", !shouldHideFields && Number(values.age) <= 15);
+
 
         return (
           <FormLayout>

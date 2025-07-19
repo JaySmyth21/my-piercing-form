@@ -29,6 +29,22 @@ const buildDataFields = (formData = {}) => {
   }, []);
 };
 
+// 🧠 API endpoint: GET /location-metadata
+app.get("/api/location-metadata", async (req, res) => {
+  try {
+    const response = await axios.get("https://api.waitwhile.com/v2/locations?limit=20", {
+      headers: {
+        Authorization: `Bearer ${process.env.WAITWHILE_API_KEY}`
+      }
+    });
+
+    res.json(response.data); // Send the full location array back
+  } catch (error) {
+    console.error("❌ Failed to fetch location metadata:", error.message);
+    res.status(500).json({ error: "Failed to fetch location metadata" });
+  }
+});
+
 // ✅ Fetch all active services from WaitWhile
 const fetchServiceMap = async () => {
   const response = await axios.get("https://api.waitwhile.com/v2/services?limit=100", {
