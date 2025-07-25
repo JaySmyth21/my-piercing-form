@@ -6,20 +6,23 @@ import SelectPiercer from './SelectPiercer';
 import ConfirmationPage from './ConfirmationPage';
 import WaitlistWatcher from "./waitlistWatcher";
 import WaitlistFullPage from './waitlistStatus';
-
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
-    <WaitlistWatcher>
-      <Routes>
-      <Route path="/" element={<Navigate to="/select-piercer" replace />} />
-      <Route path="/select-piercer" element={<SelectPiercer />} />
-      <Route path="/service-selection" element={<ServiceSelection />} />
-      <Route path="/client-info" element={<ClientInformation />} />
-      <Route path="/confirmation" element={<ConfirmationPage />} />
-      <Route path="/waitlistStatus" element={<WaitlistFullPage />} />
-    </Routes>
-  </WaitlistWatcher>
+    <>
+      <Toaster position="top-center" reverseOrder={false} />
+      {/*<WaitlistWatcher>*/}
+        <Routes>
+          <Route path="/" element={<Navigate to="/select-piercer" replace />} />
+          <Route path="/select-piercer" element={<SelectPiercer />} />
+          <Route path="/service-selection" element={<ServiceSelection />} />
+          <Route path="/client-info" element={<ClientInformation />} />
+          <Route path="/confirmation" element={<ConfirmationPage />} />
+          <Route path="/waitlistStatus" element={<WaitlistFullPage />} />
+        </Routes>
+      {/*</WaitlistWatcher>*/}
+    </>
   );
 }
 

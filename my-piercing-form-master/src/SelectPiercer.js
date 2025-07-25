@@ -49,24 +49,32 @@ const SelectPiercer = () => {
     const response = await axios.get('http://localhost:5000/api/piercers');
     console.log('✅ WaitWhile response:', response.data);
 
-    const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase(); // e.g. 'thu'
+    const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase(); // e.g. 'fri'
+    const todayDateKey = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // e.g. '20250725'
 
     const workingToday = response.data.results
-      .filter((piercer) =>
-        !piercer.isCategory &&
-        piercer.name &&
-        piercer.hours?.[todayKey]?.isOpen === true &&
-        !piercer.isAway
-      )
-      .map((piercer) => ({
-    id: piercer.id,
-    name: piercer.name,
-    description: piercer.description,
-    hours: piercer.hours,
-    photoUrl: piercer.photoUrl,
-    supportedServiceIds: piercer.supportedServiceIds, // ✅ keep this
-  }));
+      .filter((piercer) => {
+        const hasDateOverride = piercer.hoursByDate?.[todayDateKey] !== undefined;
+        const dateStatus = piercer.hoursByDate?.[todayDateKey]?.isOpen;
+        const weeklyStatus = piercer.hours?.[todayKey]?.isOpen;
 
+        const isOpenToday = hasDateOverride ? dateStatus === true : weeklyStatus === true;
+
+        return (
+          !piercer.isCategory &&
+          piercer.name &&
+          piercer.isActive &&
+          isOpenToday
+        );
+      })
+      .map((piercer) => ({
+        id: piercer.id,
+        name: piercer.name,
+        description: piercer.description,
+        hours: piercer.hours,
+        photoUrl: piercer.photoUrl,
+        supportedServiceIds: piercer.supportedServiceIds,
+      }));
 
     setAvailablePiercers(workingToday);
   } catch (error) {
@@ -76,8 +84,8 @@ const SelectPiercer = () => {
   }
 };
 
-  fetchPiercers();
-  fetchWaitTimes();
+fetchPiercers();
+fetchWaitTimes();
 }, []);
 
 

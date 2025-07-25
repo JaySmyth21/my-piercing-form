@@ -1,4 +1,6 @@
 import * as Yup from 'yup';
+import parsePhoneNumberFromString from 'libphonenumber-js/max';
+
 
 // Helper to require only when the field is visible
 export const requiredWhenVisible = (message, shouldHideFields) =>
@@ -27,9 +29,21 @@ const getClientInformationSchema = (shouldHideFields) =>
     pronunciation: Yup.string().nullable(),
     pronouns: Yup.string().nullable(),
     phoneNumber: Yup.string()
-      .nullable()
-      .required('Phone Number is required')
-      .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits'),
+  .required("Phone number is required")
+  .test("valid-global", "Enter a valid phone number", value => {
+    try {
+      const phone = parsePhoneNumberFromString(value || "");
+      return phone?.isValid();
+    } catch {
+      return false;
+    }
+  }),
+
+
+
+
+
+
 
     email: Yup.string().nullable().email('Invalid email format').required('Email is required'),
     address: Yup.string().nullable().required('Address is required'),

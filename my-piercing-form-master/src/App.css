@@ -1,3 +1,4 @@
+/* 🌐 App container styles */
 .App {
   text-align: center;
 }
@@ -35,4 +36,67 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* 📱 Phone Input Field Styling */
+
+/* Main container layout */
+.PhoneInput {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important; /* Tailwind gap-3 */
+  width: 100% !important;
+  height: 44px !important;
+  box-sizing: border-box !important;
+  
+}
+
+
+/* Country block wrapper */
+.PhoneInputCountry {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  height: 44px !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  
+}
+
+/* Country <select> dropdown */
+.PhoneInputCountrySelect {
+  appearance: auto !important;
+  background-color: white !important;
+  
+  color: inherit !important;
+  
+  box-sizing: border-box !important;
+}
+
+/* Flag container box */
+.PhoneInputCountryIcon {
+  height: 44px !important;
+  width: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  
+  background-color: white !important;
+  padding-right: 4;
+  box-sizing: border-box !important;
+  
+}
+
+/* Actual flag image */
+.PhoneInputCountryIconImg {
+  height: 24px !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+/* Optional: Input field rounding override */
+.PhoneInput input {
+  
+  box-sizing: border-box !important;
 }

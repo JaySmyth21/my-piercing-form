@@ -1,28 +1,30 @@
 import { useLocation } from "react-router-dom";
+import WaitlistReopenWatcher from "./waitlistReopenWatcher";
 
 const WaitlistStatusPage = () => {
   const { state } = useLocation();
   const { reason, nextSlotTime, reopenLabel } = state || {};
 
-  const reopenTime = nextSlotTime && !isNaN(Date.parse(nextSlotTime))
-    ? new Date(nextSlotTime).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      })
-    : null;
+  const reopenTime =
+    nextSlotTime && !isNaN(Date.parse(nextSlotTime))
+      ? new Date(nextSlotTime).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
 
   const renderMessage = () => {
     switch (reason) {
       case "WAIT_EXCEEDS_HOURS":
       case "TIME_EXCEEDS_CLOSING":
-        case "LOCATION_IS_CLOSED_FOR_DAY":
+      case "LOCATION_IS_CLOSED_FOR_DAY":
         return (
           <>
             <p className="text-xl font-semibold text-red-700 mb-2">
-              The Queue has closed for the day 
+              The Queue has closed for the day
             </p>
             <p className="text-gray-700">
-              Today’s estimated wait time would exceed our business hours.
+              Today’s estimated wait time exceeds our business hours.
             </p>
             {reopenLabel && (
               <p className="text-sm text-gray-600 mt-2">
@@ -85,6 +87,7 @@ const WaitlistStatusPage = () => {
 
   return (
     <div className="max-w-xl mx-auto p-6 text-center">
+      <WaitlistReopenWatcher />
       {renderMessage()}
     </div>
   );

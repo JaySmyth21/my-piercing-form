@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import FormLayout from "./FormLayout";
 import { motion, AnimatePresence } from "framer-motion";
-
+import DOMPurify from "dompurify";
 
 const ServiceSelection = () => {
   const navigate = useNavigate();
@@ -290,11 +290,21 @@ const ServiceSelection = () => {
                   >
                     Please specify which piercing(s) this is for?
                   </label>
-                  <Field
+                 <Field
                     name="selectedPiercing"
                     type="text"
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      const clean = DOMPurify.sanitize(raw.trim(), {
+                        ALLOWED_TAGS: [],
+                        ALLOWED_ATTR: [],
+                      });
+                      setFieldValue("selectedPiercing", clean);
+                    }}
                     className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
                   />
+
+
                   <ErrorMessage
                     name="selectedPiercing"
                     component="div"
