@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview, setFieldValue }) => {
+  
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -8,15 +10,20 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
   const [photoCaptured, setPhotoCaptured] = useState(false);
 
   const getVideo = async () => {
-    try {
-      streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = streamRef.current;
-      setCameraOpened(true);
-      setPhotoCaptured(false);
-    } catch (err) {
-      console.error("Error accessing camera: ", err);
-    }
-  };
+  if (!isMobile) {
+    alert('Camera access is only supported on mobile devices.');
+    return;
+  }
+
+  try {
+    streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoRef.current.srcObject = streamRef.current;
+    setCameraOpened(true);
+    setPhotoCaptured(false);
+  } catch (err) {
+    console.error("Error accessing camera: ", err);
+  }
+};
 
   const takePicture = () => {
     const canvas = canvasRef.current;
@@ -86,6 +93,7 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
           <input
             type="file"
             accept="image/*"
+            capture="environment"
             onChange={handleFileUpload}
             className="text-sm"
           />
