@@ -74,6 +74,13 @@ const ClientInformation = () => {
   // States for the photo capture
 
   
+const [cameraOpened1, setCameraOpened1] = useState(false);
+const [photoCaptured1, setPhotoCaptured1] = useState(false);
+const streamRef1 = useRef(null);
+
+const [cameraOpened2, setCameraOpened2] = useState(false);
+const [photoCaptured2, setPhotoCaptured2] = useState(false);
+const streamRef2 = useRef(null);
 
 const [imagePreview1, setImagePreview1] = useState(null);
 const videoRef1 = useRef(null);
