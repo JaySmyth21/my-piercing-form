@@ -75,18 +75,13 @@ const ClientInformation = () => {
 
   
 
-  const [imagePreview1, setImagePreview1] = useState(null);
-const photo1 = {
-  videoRef: useRef(null),
-  canvasRef: useRef(null),
-};
+const [imagePreview1, setImagePreview1] = useState(null);
+const videoRef1 = useRef(null);
+const canvasRef1 = useRef(null);
 
-
- const [imagePreview2, setImagePreview2] = useState(null);
-const photo2 = {
-  videoRef: useRef(null),
-  canvasRef: useRef(null),
-};
+const [imagePreview2, setImagePreview2] = useState(null);
+const videoRef2 = useRef(null);
+const canvasRef2 = useRef(null);
 
 
   const schema = getClientInformationSchema(shouldHideFields);
@@ -176,13 +171,6 @@ const handleLocalPhoneChange = (e) => {
 console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
   navigate("/confirmation", { state: { formData: fullFormData } });
 };
-
-        const [imagePreview1, setImagePreview1] = photo1.preview;
-        const [imagePreview2, setImagePreview2] = photo2.preview;
-
-
-
-
         return (
           <FormLayout>
             <Form ref={formRef}>
@@ -270,14 +258,15 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
 
               {/* Camera Sections */}
               <PhotoCaptureOrUpload
-                label="Government Issued ID"
-                fieldName="photo1"
-                imagePreview={imagePreview1}
-                setImagePreview={setImagePreview1}
-                setFieldValue={setFieldValue}
-                videoRef={photo1.videoRef}
-                canvasRef={photo1.canvasRef}
-              />
+  label="Government Issued ID"
+  fieldName="photo1"
+  imagePreview={imagePreview1}
+  setImagePreview={setImagePreview1}
+  setFieldValue={setFieldValue}
+  videoRef={videoRef1}
+  canvasRef={canvasRef1}
+/>
+
               <div className="flex flex-col items-center" data-field="photo1">
                 <ErrorMessage
                   name="photo1"
@@ -294,14 +283,15 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
                 }
               >
               <PhotoCaptureOrUpload
-                label="Government Issued ID Parent/Legal Guardian (Required if under 16)"
-                fieldName="photo2"
-                imagePreview={imagePreview2}
-                setImagePreview={setImagePreview2}
-                setFieldValue={setFieldValue}
-                videoRef={photo2.videoRef}
-                canvasRef={photo2.canvasRef}
-              />
+  label="Government Issued ID Parent/Legal Guardian"
+  fieldName="photo2"
+  imagePreview={imagePreview2}
+  setImagePreview={setImagePreview2}
+  setFieldValue={setFieldValue}
+  videoRef={videoRef2}
+  canvasRef={canvasRef2}
+/>
+
               <div className="flex flex-col items-center" data-field="photo2">
                 <ErrorMessage
                   name="photo2"
