@@ -91,35 +91,47 @@ const PhotoCaptureOrUpload = ({
       )}
 
       {!cameraOpened && !photoCaptured && (
-        <div className="flex flex-col items-center space-y-2 mt-2">
-          {isMobile ? (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileUpload}
-                id={`mobileCameraInput-${fieldName}`}
-                className="hidden"
-              />
-              <label
-                htmlFor={`mobileCameraInput-${fieldName}`}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center cursor-pointer"
-              >
-                Open Camera
-              </label>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={getVideo}
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-            >
-              Open Camera
-            </button>
-          )}
-        </div>
-      )}
+  <div className="flex flex-col items-center space-y-2 mt-2">
+    {isMobile ? (
+      <>
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileUpload}
+          id={`mobileCameraInput-${fieldName}`}
+          className="hidden"
+        />
+        <label
+          htmlFor={`mobileCameraInput-${fieldName}`}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center cursor-pointer"
+        >
+          Open Camera
+        </label>
+      </>
+    ) : (
+      <>
+        <button
+          type="button"
+          onClick={getVideo}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Open Camera
+        </button>
+
+        <label className="text-sm font-medium text-gray-700 mt-2">
+          Or upload from your device:
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          className="mt-1 block w-full sm:w-3/4 border rounded px-4 py-2 cursor-pointer text-sm"
+        />
+      </>
+    )}
+  </div>
+)}
 
       {cameraOpened && !photoCaptured && (
         <button
