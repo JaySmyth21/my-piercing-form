@@ -72,17 +72,22 @@ const ClientInformation = () => {
   const shouldHideFields = hasOnlyRestrictedServices;
 
   // States for the photo capture
-  const photo1 = {
-    preview: useState(null),
-    videoRef: useRef(null),
-    canvasRef: useRef(null),
-  };
 
-  const photo2 = {
-    preview: useState(null),
-    videoRef: useRef(null),
-    canvasRef: useRef(null),
-  };
+  
+
+  const [imagePreview1, setImagePreview1] = useState(null);
+const photo1 = {
+  videoRef: useRef(null),
+  canvasRef: useRef(null),
+};
+
+
+ const [imagePreview2, setImagePreview2] = useState(null);
+const photo2 = {
+  videoRef: useRef(null),
+  canvasRef: useRef(null),
+};
+
 
   const schema = getClientInformationSchema(shouldHideFields);
 
