@@ -1,4 +1,4 @@
-
+console.log("Axios path:", require.resolve("axios"));
 const axios = require('axios');
 const cors = require('cors');
 require("dotenv").config();
@@ -11,9 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
-console.log("Attempting to require express...");
-const express = require("express");
-console.log("Express loaded successfully.");
+
 // ✅ Convert formData into WaitWhile dataFields
 const buildDataFields = (formData = {}) => {
   return Object.entries(fieldMap).reduce((acc, [key, fieldId]) => {
