@@ -265,6 +265,11 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
   setFieldValue={setFieldValue}
   videoRef={videoRef1}
   canvasRef={canvasRef1}
+  streamRef={streamRef1}
+  cameraOpened={cameraOpened1}
+  setCameraOpened={setCameraOpened1}
+  photoCaptured={photoCaptured1}
+  setPhotoCaptured={setPhotoCaptured1}
 />
 
               <div className="flex flex-col items-center" data-field="photo1">
@@ -290,6 +295,11 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
   setFieldValue={setFieldValue}
   videoRef={videoRef2}
   canvasRef={canvasRef2}
+  streamRef={streamRef2}
+  cameraOpened={cameraOpened2}
+  setCameraOpened={setCameraOpened2}
+  photoCaptured={photoCaptured2}
+  setPhotoCaptured={setPhotoCaptured2}
 />
 
               <div className="flex flex-col items-center" data-field="photo2">

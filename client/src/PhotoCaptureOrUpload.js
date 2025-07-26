@@ -1,35 +1,49 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
+
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview, setFieldValue }) => {
-  
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
-  const [cameraOpened, setCameraOpened] = useState(false);
-  const [photoCaptured, setPhotoCaptured] = useState(false);
+const PhotoCaptureOrUpload = ({
+  label,
+  fieldName,
+  imagePreview,
+  setImagePreview,
+  setFieldValue,
+  videoRef,
+  canvasRef,
+  streamRef,
+  cameraOpened,
+  setCameraOpened,
+  photoCaptured,
+  setPhotoCaptured
+}) => {
 
   const getVideo = async () => {
-  try {
-    streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoRef.current.srcObject = streamRef.current;
-    setCameraOpened(true);
-    setPhotoCaptured(false);
-  } catch (err) {
-    console.error("Error accessing camera: ", err);
-  }
-};
+    try {
+      streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+      setCameraOpened(true);
+      setPhotoCaptured(false);
+    } catch (err) {
+      console.error("Error accessing camera: ", err);
+    }
+  };
 
   const takePicture = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
+    if (!canvas || !video) return;
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
+
     const imageData = canvas.toDataURL('image/png');
     setImagePreview(imageData);
     setFieldValue(fieldName, imageData);
     setPhotoCaptured(true);
+
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       setCameraOpened(false);
@@ -77,36 +91,35 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
       )}
 
       {!cameraOpened && !photoCaptured && (
-  <div className="flex flex-col items-center space-y-2 mt-2">
-    {isMobile ? (
-  <>
-    <input
-      type="file"
-      accept="image/*"
-      capture="environment"
-      onChange={handleFileUpload}
-      id="mobileCameraInput"
-      className="hidden"
-    />
-    <label
-      htmlFor="mobileCameraInput"
-      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center cursor-pointer"
-    >
-      Open Camera
-    </label>
-  </>
-) : (
-  <button
-    type="button"
-    onClick={getVideo}
-    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-  >
-    Open Camera
-  </button>
-)}
-
-  </div>
-)}
+        <div className="flex flex-col items-center space-y-2 mt-2">
+          {isMobile ? (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileUpload}
+                id={`mobileCameraInput-${fieldName}`}
+                className="hidden"
+              />
+              <label
+                htmlFor={`mobileCameraInput-${fieldName}`}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center cursor-pointer"
+              >
+                Open Camera
+              </label>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={getVideo}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Open Camera
+            </button>
+          )}
+        </div>
+      )}
 
       {cameraOpened && !photoCaptured && (
         <button
