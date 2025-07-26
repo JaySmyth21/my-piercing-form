@@ -22,7 +22,7 @@ const WaitlistReopenWatcher = () => {
       }
 
       try {
-        const res = await axios.get("http://localhost:5000/api/location-status");
+        const res = await axios.get("https://my-piercing-form.onrender.com/api/location-status");
         const location = res.data.results.find(
           (loc) => loc.id === "C54Z3Pj94nj6gTSTpCxD"
         );

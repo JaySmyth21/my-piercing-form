@@ -41,7 +41,7 @@ const ServiceSelection = () => {
   useEffect(() => {
   const fetchServices = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/services");
+      const res = await axios.get("https://my-piercing-form.onrender.com/api/services");
       const allServices = res.data;
       
 

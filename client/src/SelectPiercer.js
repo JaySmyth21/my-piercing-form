@@ -16,7 +16,7 @@ const SelectPiercer = () => {
     // ⏳ Fetch Wait Times
   const fetchWaitTimes = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/api/location-status');
+    const res = await axios.get('https://my-piercing-form.onrender.com/api/location-status');
     const nested = res.data.results?.[0]?.waitByResource;
 
     if (!nested) {
@@ -46,7 +46,7 @@ const SelectPiercer = () => {
 
   const fetchPiercers = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/piercers');
+    const response = await axios.get('https://my-piercing-form.onrender.com/api/piercers');
     console.log('✅ WaitWhile response:', response.data);
 
     const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase(); // e.g. 'fri'

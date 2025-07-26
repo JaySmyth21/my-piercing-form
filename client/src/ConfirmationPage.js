@@ -36,7 +36,7 @@ const Confirmation = () => {
     setSubmitError(null);
 
     try {
-      const response = await axios.get("http://localhost:5000/api/services");
+      const response = await axios.get("https://my-piercing-form.onrender.com/api/services");
       const serviceMap = {};
       response.data.forEach(service => {
         serviceMap[service.name] = service.id;
@@ -71,7 +71,7 @@ const Confirmation = () => {
         console.log("❌ Upload error:", err);
       }
 
-      await axios.post("http://localhost:5000/api/create-visit", {
+      await axios.post("https://my-piercing-form.onrender.com/api/create-visit", {
         ...cleanFormData,
         serviceIds,
         locationId: "C54Z3Pj94nj6gTSTpCxD",
