@@ -79,22 +79,32 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
       {!cameraOpened && !photoCaptured && (
   <div className="flex flex-col items-center space-y-2 mt-2">
     {isMobile ? (
-      <input
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={handleFileUpload}
-        className="text-sm"
-      />
-    ) : (
-      <button
-        type="button"
-        onClick={getVideo}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-      >
-        Open Camera
-      </button>
-    )}
+  <>
+    <input
+      type="file"
+      accept="image/*"
+      capture="environment"
+      onChange={handleFileUpload}
+      id="mobileCameraInput"
+      className="hidden"
+    />
+    <label
+      htmlFor="mobileCameraInput"
+      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center cursor-pointer"
+    >
+      Open Camera
+    </label>
+  </>
+) : (
+  <button
+    type="button"
+    onClick={getVideo}
+    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+  >
+    Open Camera
+  </button>
+)}
+
   </div>
 )}
 
