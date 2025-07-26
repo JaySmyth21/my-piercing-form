@@ -10,11 +10,6 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
   const [photoCaptured, setPhotoCaptured] = useState(false);
 
   const getVideo = async () => {
-  if (!isMobile) {
-    alert('Camera access is only supported on mobile devices.');
-    return;
-  }
-
   try {
     streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
     videoRef.current.srcObject = streamRef.current;
@@ -82,23 +77,26 @@ const PhotoCaptureOrUpload = ({ label, fieldName, imagePreview, setImagePreview,
       )}
 
       {!cameraOpened && !photoCaptured && (
-        <div className="flex flex-col items-center space-y-2 mt-2">
-          <button
-            type="button"
-            onClick={getVideo}
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          >
-            Open Camera
-          </button>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileUpload}
-            className="text-sm"
-          />
-        </div>
-      )}
+  <div className="flex flex-col items-center space-y-2 mt-2">
+    {isMobile ? (
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileUpload}
+        className="text-sm"
+      />
+    ) : (
+      <button
+        type="button"
+        onClick={getVideo}
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Open Camera
+      </button>
+    )}
+  </div>
+)}
 
       {cameraOpened && !photoCaptured && (
         <button
