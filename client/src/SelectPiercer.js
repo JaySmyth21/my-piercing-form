@@ -63,7 +63,7 @@ const SelectPiercer = () => {
         return (
           !piercer.isCategory &&
           piercer.name &&
-          piercer.isActive &&
+          //piercer.isActive &&
           isOpenToday
         );
       })
