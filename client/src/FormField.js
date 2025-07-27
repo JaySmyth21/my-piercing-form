@@ -11,8 +11,6 @@ const FormField = ({ name, label, required, type = 'text' }) => (
       name={name}
       className="border border-gray-300 p-2 rounded w-full sm:w-3/4"
     />
-    
-
   </div>
 );
 

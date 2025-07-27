@@ -26,7 +26,6 @@ const RadioGroupField = ({ name, label, options, required }) => {
             {option.charAt(0).toUpperCase() + option.slice(1)}
           </label>
         ))}
-        
       </div>
     </div>
   );

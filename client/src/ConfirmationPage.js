@@ -36,14 +36,16 @@ const Confirmation = () => {
     setSubmitError(null);
 
     try {
-      const response = await axios.get("https://my-piercing-form.onrender.com/api/services");
+      const response = await axios.get(
+        "https://my-piercing-form.onrender.com/api/services"
+      );
       const serviceMap = {};
-      response.data.forEach(service => {
+      response.data.forEach((service) => {
         serviceMap[service.name] = service.id;
       });
 
       const serviceIds = formData.selectedServices
-        .map(name => serviceMap[name])
+        .map((name) => serviceMap[name])
         .filter(Boolean);
 
       const { photo1, photo2, signature, ...cleanFormData } = formData;
@@ -58,28 +60,37 @@ const Confirmation = () => {
 
       try {
         await uploadBase64Image(photo1, `${basePath}/photo1.jpg`);
-        photo1URL = await getDownloadURL(ref(storage, `${basePath}/photo1.jpg`));
+        photo1URL = await getDownloadURL(
+          ref(storage, `${basePath}/photo1.jpg`)
+        );
 
         if (photo2) {
           await uploadBase64Image(photo2, `${basePath}/photo2.jpg`);
-          photo2URL = await getDownloadURL(ref(storage, `${basePath}/photo2.jpg`));
+          photo2URL = await getDownloadURL(
+            ref(storage, `${basePath}/photo2.jpg`)
+          );
         }
 
         await uploadBase64Image(signature, `${basePath}/signature.jpg`);
-        signatureURL = await getDownloadURL(ref(storage, `${basePath}/signature.jpg`));
+        signatureURL = await getDownloadURL(
+          ref(storage, `${basePath}/signature.jpg`)
+        );
       } catch (err) {
         console.log("❌ Upload error:", err);
       }
 
-      await axios.post("https://my-piercing-form.onrender.com/api/create-visit", {
-        ...cleanFormData,
-        serviceIds,
-        locationId: "C54Z3Pj94nj6gTSTpCxD",
-        name: fullName,
-        photo1URL,
-        photo2URL,
-        signatureURL,
-      });
+      await axios.post(
+        "https://my-piercing-form.onrender.com/api/create-visit",
+        {
+          ...cleanFormData,
+          serviceIds,
+          locationId: "C54Z3Pj94nj6gTSTpCxD",
+          name: fullName,
+          photo1URL,
+          photo2URL,
+          signatureURL,
+        }
+      );
 
       setSubmitSuccess(true);
     } catch (error) {
@@ -120,15 +131,31 @@ const Confirmation = () => {
 
         {alreadySubmitted && !submitSuccess && (
           <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-4">
-            <p className="text-yellow-800 font-medium text-lg">ℹ️ This visit has already been submitted.</p>
-            <p className="text-yellow-700">If you need to make changes, please restart your booking or contact support.</p>
+            <p className="text-yellow-800 font-medium text-lg">
+              ℹ️ This visit has already been submitted.
+            </p>
+            <p className="text-yellow-700">
+              If you need to make changes, please restart your booking or
+              contact support.
+            </p>
           </div>
         )}
 
         {isSubmitting && (
           <div className="flex items-center justify-center space-x-2 text-blue-600">
-            <svg className="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <svg
+              className="animate-spin h-5 w-5 text-blue-600"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+                fill="none"
+              />
               <path
                 className="opacity-75"
                 fill="currentColor"
@@ -141,8 +168,12 @@ const Confirmation = () => {
 
         {submitSuccess && (
           <div className="mt-6 bg-green-50 border-l-4 border-green-500 p-4">
-            <p className="text-green-700 font-semibold text-lg">✅ You've been added to the queue!</p>
-            <p className="text-green-700">📱 You'll receive a text message when you're next in line!</p>
+            <p className="text-green-700 font-semibold text-lg">
+              ✅ You've been added to the queue!
+            </p>
+            <p className="text-green-700">
+              📱 You'll receive a text message when you're next in line!
+            </p>
             <p className="text-green-700">
               View the queue here:{" "}
               <a
@@ -159,7 +190,8 @@ const Confirmation = () => {
 
         {submitError && (
           <p className="mt-6 text-red-600">
-            Something went wrong creating your visit. Please try again or contact support.
+            Something went wrong creating your visit. Please try again or
+            contact support.
           </p>
         )}
       </div>
