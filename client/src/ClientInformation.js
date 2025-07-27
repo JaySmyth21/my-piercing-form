@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, forwardRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate, useLocation } from "react-router-dom";
-import PhoneInput from 'react-phone-number-input';
-import './App.css';
+import PhoneInput from "react-phone-number-input";
+import "./App.css";
 
 // Components
 import FormLayout from "./FormLayout";
@@ -21,7 +21,6 @@ const ClientInformation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const formRef = useRef(null);
-
 
   const initialValues = {
     preferredName: "",
@@ -59,43 +58,37 @@ const ClientInformation = () => {
   const selectedPiercer = location.state?.selectedPiercer || null;
   const piercingServiceNames = location.state?.piercingServiceNames || [];
   const piercingDescription = location.state?.piercingDescription || null;
-  console.log(selectedServices);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const hasOnlyRestrictedServices = selectedServices.every(
-    (service) => !piercingServiceNames.includes(service),
+    (service) => !piercingServiceNames.includes(service)
   );
 
   const shouldHideFields = hasOnlyRestrictedServices;
 
-  // States for the photo capture
+  const [cameraOpened1, setCameraOpened1] = useState(false);
+  const [photoCaptured1, setPhotoCaptured1] = useState(false);
+  const streamRef1 = useRef(null);
 
-  
-const [cameraOpened1, setCameraOpened1] = useState(false);
-const [photoCaptured1, setPhotoCaptured1] = useState(false);
-const streamRef1 = useRef(null);
+  const [cameraOpened2, setCameraOpened2] = useState(false);
+  const [photoCaptured2, setPhotoCaptured2] = useState(false);
+  const streamRef2 = useRef(null);
 
-const [cameraOpened2, setCameraOpened2] = useState(false);
-const [photoCaptured2, setPhotoCaptured2] = useState(false);
-const streamRef2 = useRef(null);
+  const [imagePreview1, setImagePreview1] = useState(null);
+  const videoRef1 = useRef(null);
+  const canvasRef1 = useRef(null);
 
-const [imagePreview1, setImagePreview1] = useState(null);
-const videoRef1 = useRef(null);
-const canvasRef1 = useRef(null);
-
-const [imagePreview2, setImagePreview2] = useState(null);
-const videoRef2 = useRef(null);
-const canvasRef2 = useRef(null);
-
+  const [imagePreview2, setImagePreview2] = useState(null);
+  const videoRef2 = useRef(null);
+  const canvasRef2 = useRef(null);
 
   const schema = getClientInformationSchema(shouldHideFields);
 
- 
-const [countryPrefix, setCountryPrefix] = useState("+1"); // default
-const [localPhone, setLocalPhone] = useState(""); // input field only
+  const [countryPrefix, setCountryPrefix] = useState("+1"); // default
+  const [localPhone, setLocalPhone] = useState(""); // input field only
 
   return (
     <Formik
@@ -105,79 +98,76 @@ const [localPhone, setLocalPhone] = useState(""); // input field only
     >
       {(formik) => {
         if (!formik) return null;
-
         const { values, setFieldValue } = formik;
-         
 
-const handleCountryChange = (value) => {
-  const match = value?.match(/^\+[\d]+/) || [];
-  const prefix = match[0] || "+1";
-  setCountryPrefix(prefix);
-  setFieldValue("phoneNumber", `${prefix}${localPhone}`);
-};
-const InvisibleInput = React.forwardRef((props, ref) => (
-  <input
-    ref={ref}
-    {...props}
-    type="text"
-    style={{
-      position: "absolute",
-      opacity: 0,
-      pointerEvents: "none",
-      width: "1px",
-      height: "1px",
-    }}
-    aria-hidden="true"
-    tabIndex={-1}
-  />
-));
+        const handleCountryChange = (value) => {
+          const match = value?.match(/^\+[\d]+/) || [];
+          const prefix = match[0] || "+1";
+          setCountryPrefix(prefix);
+          setFieldValue("phoneNumber", `${prefix}${localPhone}`);
+        };
 
+        const InvisibleInput = React.forwardRef((props, ref) => (
+          <input
+            ref={ref}
+            {...props}
+            type="text"
+            style={{
+              position: "absolute",
+              opacity: 0,
+              pointerEvents: "none",
+              width: "1px",
+              height: "1px",
+            }}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+        ));
 
-const handleLocalPhoneChange = (e) => {
-  const value = e.target.value.replace(/^\+[\d]+/, "");
-  setLocalPhone(value);
-  setFieldValue("phoneNumber", `${countryPrefix}${value}`);
-};
+        const handleLocalPhoneChange = (e) => {
+          const value = e.target.value.replace(/^\+[\d]+/, "");
+          setLocalPhone(value);
+          setFieldValue("phoneNumber", `${countryPrefix}${value}`);
+        };
 
-       const handleCustomSubmit = async () => {
-  const errors = await formik.validateForm();
+        const handleCustomSubmit = async () => {
+          const errors = await formik.validateForm();
 
-  formik.setTouched(
-    Object.fromEntries(
-      Object.keys(formik.initialValues).map((key) => [key, true])
-    )
-  );
+          formik.setTouched(
+            Object.fromEntries(
+              Object.keys(formik.initialValues).map((key) => [key, true])
+            )
+          );
 
-  if (Object.keys(errors).length > 0) {
-    console.warn("⛔ Validation failed — not submitting");
-    console.log(errors);
+          if (Object.keys(errors).length > 0) {
+            console.warn("⛔ Validation failed — not submitting");
+            console.log(errors);
 
-    const firstField = Object.keys(errors)[0];
-    let node = document.querySelector(`[name="${firstField}"]`);
+            const firstField = Object.keys(errors)[0];
+            let node = document.querySelector(`[name="${firstField}"]`);
 
-    if (!node) {
-      node = document.querySelector(`[data-field="${firstField}"]`);
-    }
-    if (node) {
-      node.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+            if (!node) {
+              node = document.querySelector(`[data-field="${firstField}"]`);
+            }
+            if (node) {
+              node.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
 
-    return;
-  }
+            return;
+          }
 
-  // 🧼 Sanitize values before submitting
-  const cleanedValues = sanitizeClientFormValues(formik.values);
+          // 🧼 Sanitize values before submitting
+          const cleanedValues = sanitizeClientFormValues(formik.values);
 
-  const fullFormData = {
-    ...cleanedValues,
-    selectedServices,
-    selectedPiercerName: selectedPiercer.name,
-    piercingDescription,
-  };
-  console.log("🔍 Raw values:", formik.values);
-console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
-  navigate("/confirmation", { state: { formData: fullFormData } });
-};
+          const fullFormData = {
+            ...cleanedValues,
+            selectedServices,
+            selectedPiercerName: selectedPiercer.name,
+            piercingDescription,
+          };
+
+          navigate("/confirmation", { state: { formData: fullFormData } });
+        };
         return (
           <FormLayout>
             <Form ref={formRef}>
@@ -187,97 +177,100 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
 
               {/* Input Fields */}
               <div className="flex flex-col space-y-6 mt-10">
-  {[
-    { name: "preferredName", label: "Preferred Name or First Name", required: true },
-    { name: "lastName", label: "Last Name", required: true },
-    { name: "pronunciation", label: "Pronunciation" },
-    { name: "pronouns", label: "Pronouns" },
-    { name: "phoneNumber", label: "Phone Number", required: true },
-    { name: "email", label: "Email", required: true },
-    { name: "address", label: "Address", required: true },
-    { name: "city", label: "City", required: true },
-    { name: "postalCode", label: "Postal Code", required: true },
-    { name: "age", label: "Age", required: true, type: "number" },
-    { name: "occupation", label: "Occupation/Sport" },
-  ].map((field) => (
-   <div key={field.name} className="w-full">
-  {field.name === "phoneNumber" ? (
-    <div className="flex flex-col items-center">
-      <label className="block mb-2 text-left w-full sm:w-3/4">
-        Phone Number <span className="text-red-600 ml-1">*</span>
-      </label>
+                {[
+                  {
+                    name: "preferredName",
+                    label: "Preferred Name or First Name",
+                    required: true,
+                  },
+                  { name: "lastName", label: "Last Name", required: true },
+                  { name: "pronunciation", label: "Pronunciation" },
+                  { name: "pronouns", label: "Pronouns" },
+                  {
+                    name: "phoneNumber",
+                    label: "Phone Number",
+                    required: true,
+                  },
+                  { name: "email", label: "Email", required: true },
+                  { name: "address", label: "Address", required: true },
+                  { name: "city", label: "City", required: true },
+                  { name: "postalCode", label: "Postal Code", required: true },
+                  { name: "age", label: "Age", required: true, type: "number" },
+                  { name: "occupation", label: "Occupation/Sport" },
+                ].map((field) => (
+                  <div key={field.name} className="w-full">
+                    {field.name === "phoneNumber" ? (
+                      <div className="flex flex-col items-center">
+                        <label className="block mb-2 text-left w-full sm:w-3/4">
+                          Phone Number{" "}
+                          <span className="text-red-600 ml-1">*</span>
+                        </label>
+                        <div className="w-full sm:w-3/4 overflow-x-visible">
+                          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 h-auto w-full">
+                            {/* 🌐 Country Selector */}
+                            <PhoneInput
+                              international
+                              defaultCountry="CA"
+                              value={countryPrefix}
+                              onChange={handleCountryChange}
+                              inputComponent={InvisibleInput}
+                              countrySelectProps={{
+                                className:
+                                  "!w-[100px] !min-w-[100px] !max-w-[100px] h-[44px] text-sm border border-gray-300 rounded bg-white",
+                              }}
+                              className="!m-0 !p-0 !w-[100px] !min-w-[100px] !max-w-[100px] overflow-hidden flex-shrink-0"
+                            />
 
-      <div className="w-full sm:w-3/4 overflow-x-visible">
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 h-auto w-full">
-          {/* 🌐 Country Selector */}
-          <PhoneInput
-            international
-            defaultCountry="CA"
-            value={countryPrefix}
-            onChange={handleCountryChange}
-            inputComponent={InvisibleInput}
-            countrySelectProps={{
-              className:
-                "!w-[100px] !min-w-[100px] !max-w-[100px] h-[44px] text-sm border border-gray-300 rounded bg-white",
-            }}
-            className="!m-0 !p-0 !w-[100px] !min-w-[100px] !max-w-[100px] overflow-hidden flex-shrink-0"
-          />
+                            {/* 🔒 Locked Country Prefix */}
+                            <span className="px-3 border border-gray-300 bg-gray-100 text-gray-600 rounded text-sm flex items-center h-[44px] !min-w-[44px] !max-w-[60px] flex-shrink-0">
+                              {countryPrefix}
+                            </span>
 
-          {/* 🔒 Locked Country Prefix */}
-          <span className="px-3 border border-gray-300 bg-gray-100 text-gray-600 rounded text-sm flex items-center h-[44px] !min-w-[44px] !max-w-[60px] flex-shrink-0">
-            {countryPrefix}
-          </span>
-
-          {/* 📱 Local Phone Number Input */}
-          <div className="flex w-full sm:flex-1 min-w-0 mt-2 sm:mt-0">
-            <input
-              type="tel"
-              name={field.name}
-              value={localPhone}
-              onChange={handleLocalPhoneChange}
-              onBlur={formik.handleBlur}
-              placeholder="Your phone number"
-              className="flex-1 h-[44px] text-lg px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none min-w-0"
-            />
-          </div>
-        </div>
-      </div>
-
-     
-    </div>
-  ) : (
-    <FormField {...field} />
-  )}
-  <div className="flex flex-col items-center">
-  <ErrorMessage
-        name={field.name}
-        component="div"
-        className="form-error text-red-600 mt-2 text-left w-full sm:w-3/4"
-        data-field={field.name}
-      />
-      </div>
-</div>
-
-
-  ))}
-</div>
-
+                            {/* 📱 Local Phone Number Input */}
+                            <div className="flex w-full sm:flex-1 min-w-0 mt-2 sm:mt-0">
+                              <input
+                                type="tel"
+                                name={field.name}
+                                value={localPhone}
+                                onChange={handleLocalPhoneChange}
+                                onBlur={formik.handleBlur}
+                                placeholder="Your phone number"
+                                className="flex-1 h-[44px] text-lg px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none min-w-0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <FormField {...field} />
+                    )}
+                    <div className="flex flex-col items-center">
+                      <ErrorMessage
+                        name={field.name}
+                        component="div"
+                        className="form-error text-red-600 mt-2 text-left w-full sm:w-3/4"
+                        data-field={field.name}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
 
               {/* Camera Sections */}
               <PhotoCaptureOrUpload
-  label="Government Issued ID"
-  fieldName="photo1"
-  imagePreview={imagePreview1}
-  setImagePreview={setImagePreview1}
-  setFieldValue={setFieldValue}
-  videoRef={videoRef1}
-  canvasRef={canvasRef1}
-  streamRef={streamRef1}
-  cameraOpened={cameraOpened1}
-  setCameraOpened={setCameraOpened1}
-  photoCaptured={photoCaptured1}
-  setPhotoCaptured={setPhotoCaptured1}
-/>
+                label="Government Issued ID"
+                fieldName="photo1"
+                imagePreview={imagePreview1}
+                setImagePreview={setImagePreview1}
+                setFieldValue={setFieldValue}
+                videoRef={videoRef1}
+                canvasRef={canvasRef1}
+                streamRef={streamRef1}
+                cameraOpened={cameraOpened1}
+                setCameraOpened={setCameraOpened1}
+                photoCaptured={photoCaptured1}
+                setPhotoCaptured={setPhotoCaptured1}
+              />
 
               <div className="flex flex-col items-center" data-field="photo1">
                 <ErrorMessage
@@ -294,30 +287,29 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
                   Number(values.age) <= 15
                 }
               >
-              <PhotoCaptureOrUpload
-  label="Government Issued ID Parent/Legal Guardian"
-  fieldName="photo2"
-  imagePreview={imagePreview2}
-  setImagePreview={setImagePreview2}
-  setFieldValue={setFieldValue}
-  videoRef={videoRef2}
-  canvasRef={canvasRef2}
-  streamRef={streamRef2}
-  cameraOpened={cameraOpened2}
-  setCameraOpened={setCameraOpened2}
-  photoCaptured={photoCaptured2}
-  setPhotoCaptured={setPhotoCaptured2}
-/>
-
-              <div className="flex flex-col items-center" data-field="photo2">
-                <ErrorMessage
-                  name="photo2"
-                  component="div"
-                  className="text-red-600 w-full sm:w-3/4"
+                <PhotoCaptureOrUpload
+                  label="Government Issued ID Parent/Legal Guardian"
+                  fieldName="photo2"
+                  imagePreview={imagePreview2}
+                  setImagePreview={setImagePreview2}
+                  setFieldValue={setFieldValue}
+                  videoRef={videoRef2}
+                  canvasRef={canvasRef2}
+                  streamRef={streamRef2}
+                  cameraOpened={cameraOpened2}
+                  setCameraOpened={setCameraOpened2}
+                  photoCaptured={photoCaptured2}
+                  setPhotoCaptured={setPhotoCaptured2}
                 />
-              </div>
-              </ConditionalSection>
 
+                <div className="flex flex-col items-center" data-field="photo2">
+                  <ErrorMessage
+                    name="photo2"
+                    component="div"
+                    className="text-red-600 w-full sm:w-3/4"
+                  />
+                </div>
+              </ConditionalSection>
 
               {/* Age of Consent Checkbox */}
               <CheckboxField
@@ -356,7 +348,7 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
                 options={["yes", "no"]}
                 required
               />
-                <div className="flex flex-col items-center ">
+              <div className="flex flex-col items-center ">
                 <div className="flex items-center w-full sm:w-3/4">
                   <ErrorMessage
                     name="eaten"
@@ -579,13 +571,11 @@ console.log("🧼 Sanitized values:", sanitizeClientFormValues(formik.values));
                 </div>
               </div>
 
-
-
               <RadioGroupField
-              name="decisionImpare"
-              label="Is there any reason why your decision-making abilities may be impaired? for example, by the recent consumption of certain medications, non-prescribed drugs or alcohol? (Required)?"
-              options={["yes", "no"]}
-              required
+                name="decisionImpare"
+                label="Is there any reason why your decision-making abilities may be impaired? for example, by the recent consumption of certain medications, non-prescribed drugs or alcohol? (Required)?"
+                options={["yes", "no"]}
+                required
               />
               {/* Signature */}
               <SignatureField

@@ -4,7 +4,6 @@ import { Field, useFormikContext } from 'formik';
 const CheckboxGroupField = ({ name, label, options, required }) => {
   const { values } = useFormikContext();
   const currentValues = values[name] || [];
-
   return (
     <div className="flex flex-col items-center mt-10">
       <label className="block mb-2 text-left w-full sm:w-3/4">

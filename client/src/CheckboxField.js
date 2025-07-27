@@ -21,8 +21,6 @@ const CheckboxField = ({ name, label, required }) => (
         {required && <span className="text-red-600 ml-1">*</span>}
       </label>
     </div>
-
-    
   </div>
 );
 
