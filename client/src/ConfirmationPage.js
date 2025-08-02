@@ -50,9 +50,18 @@ const Confirmation = () => {
 
       const { photo1, photo2, signature, ...cleanFormData } = formData;
       const fullName = `${formData.preferredName} ${formData.lastName}`.trim();
-      const timestamp = Date.now();
-      const folderName = `${fullName}_${timestamp}`;
+
+      const pad = (n) => n.toString().padStart(2, "0");
+      const now = new Date();
+      const day = pad(now.getDate());
+      const month = pad(now.getMonth() + 1);
+      const year = now.getFullYear();
+      const hours = pad(now.getHours());
+      const minutes = pad(now.getMinutes());
+
+      const folderName = `${fullName}_${day}-${month}-${year}_${hours}-${minutes}`;
       const basePath = `photos/${folderName}`;
+
 
       let photo1URL = "";
       let photo2URL = "";
